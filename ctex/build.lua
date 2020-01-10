@@ -11,9 +11,6 @@ installfiles = {"*.sty", "*.cls", "*.clo", "*.def", "*.cfg", "*.fd", "*.tex", "*
 unpackexe = "xetex"
 typesetexe = "xelatex"
 makeindexexe = "zhmakeindex"
-checkopts = "-file-line-error -halt-on-error -interaction=nonstopmode"
-typesetopts = "-file-line-error -halt-on-error -interaction=nonstopmode"
-
 
 gbkfiles = {"ctex-name-gbk.cfg", "*-ChineseGBK.dict"}
 generic_insatllfiles = {"*.tex"}
@@ -46,7 +43,7 @@ maindir        = "."
 supportdir     = "../tool"
 testfiledir    = "./test/testfiles"
 testsuppdir    = "./test/support"
-testdir        = "./build/l3test"
+testdir        = "./build/check"
 checkruns      = 2
 stdengine      = "xetex"
 checkengines   = {"pdftex", "xetex", "luatex", "uptex"}
