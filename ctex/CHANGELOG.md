@@ -15,6 +15,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - `\ctex_if_platform_macos:TF`: 改用 `/System/Library/Fonts/Menlo.ttc` 为特征文件 - [#455](https://github.com/CTeX-org/ctex-kit/issues/455)
 - `windows` 使用环境变量代替绝对路径查找字体，即改用 `$WINDIR/Fonts/msyh.ttc` 为特征文件
 
+### Fixed
+
+- 兼容 `titletoc`，防止目录中章节名和标题现重合 - [#472](https://github.com/CTeX-org/ctex-kit/issues/472)
+
 ### Deprecated
 
 - 不再支持 Windows XP 系统，`windowsold` 和 `windowsnew` 成为过时字库选项
