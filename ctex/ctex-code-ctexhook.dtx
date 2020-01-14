@@ -1,0 +1,101 @@
+% \iffalse meta-comment
+%
+% Copyright (C) 2003--2020
+% CTEX.ORG and any individual authors listed elsewhere in this file.
+% --------------------------------------------------------------------------
+%
+% This work may be distributed and/or modified under the
+% conditions of the LaTeX Project Public License, either
+% version 1.3c of this license or (at your option) any later
+% version. This version of this license is in
+%    http://www.latex-project.org/lppl/lppl-1-3c.txt
+% and the latest version of this license is in
+%    http://www.latex-project.org/lppl.txt
+% and version 1.3 or later is part of all distributions of
+% LaTeX version 2005/12/01 or later.
+%
+% This work has the LPPL maintenance status `maintained'.
+%
+% The Current Maintainers of this work are Leo Liu, Qing Lee and Liam Huang.
+%
+% --------------------------------------------------------------------------
+%
+% \fi
+%
+% \section{\pkg{ctexhook} 宏包}
+%
+%    \begin{macrocode}
+%<*ctexhook>
+%    \end{macrocode}
+%
+% \begin{macro}[int]{\ctex_at_end_preamble:n,\ctex_after_end_preamble:n}
+% 实现 \pkg{etoolbox} 宏包的 \tn{AtEndPreamble} 和 \tn{AfterEndPreamble}。
+%    \begin{macrocode}
+\cs_new_protected:Npn \ctex_at_end_preamble:n #1
+  { \tl_gput_right:Nn \g_@@_end_preamble_hook_tl {#1} }
+\cs_new_protected:Npn \ctex_after_end_preamble:n #1
+  { \tl_gput_right:Nn \g_@@_after_end_preamble_hook_tl {#1} }
+\cs_new_protected_nopar:Npn \CTEX@document@left@hook
+  { \group_end: \g_@@_end_preamble_hook_tl \group_begin: }
+\cs_new_protected_nopar:Npn \CTEX@document@right@hook
+  { \scan_stop: \g_@@_after_end_preamble_hook_tl \tex_ignorespaces:D }
+\cs_set_nopar:Npx \document
+  {
+    \CTEX@document@left@hook
+    \exp_not:o { \document }
+    \CTEX@document@right@hook
+  }
+\tl_new:N \g_@@_end_preamble_hook_tl
+\tl_new:N \g_@@_after_end_preamble_hook_tl
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[int]{\ctex_at_end_package:nn}
+% 与 \pkg{filehook} 的 \tn{AtEndOfPackageFile*} 类似，如果原来没有在载入宏包则
+% 在宏包末尾执行语句，否则立即执行。
+%    \begin{macrocode}
+\cs_new_protected:Npn \ctex_at_end_package:nn #1#2
+  {
+    \@ifpackageloaded {#1}
+      {#2}
+      { \ctex_gadd_hook:cn { g_@@_at_end_ #1 _hook_tl } {#2} }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[int]{\ctex_gadd_hook:Nn, \ctex_gadd_hook:cn}
+% 给钩子附加内容。
+%    \begin{macrocode}
+\cs_new_protected:Npn \ctex_gadd_hook:Nn #1#2
+  {
+    \tl_if_exist:NF #1 { \tl_new:N #1 }
+    \tl_gput_right:Nn #1 {#2}
+  }
+\cs_generate_variant:Nn \ctex_gadd_hook:Nn { c }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[int]{\ctex_package_end_hook:n, \ctex_package_end_hook:o}
+% 宏包末尾钩子，只执行一次，用后清除。
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \ctex_package_end_hook:n #1
+  {
+    \cs_if_exist_use:cT { g_@@_at_end_ #1 _hook_tl }
+      { \cs_undefine:c { g_@@_at_end_ #1 _hook_tl } }
+  }
+\cs_generate_variant:Nn \ctex_package_end_hook:n { o }
+%    \end{macrocode}
+% \end{macro}
+%
+% 对 \tn{@popfilename} 做补丁来实现 \cs{ctex_at_end_package:nn} 的功能。
+%    \begin{macrocode}
+\tl_put_left:Nn \@popfilename
+  {
+    \cs_if_eq:NNT \@currext \@pkgextension
+      { \ctex_package_end_hook:o { \@currname } }
+  }
+%    \end{macrocode}
+%
+%    \begin{macrocode}
+%</ctexhook>
+%    \end{macrocode}

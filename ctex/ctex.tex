@@ -1,0 +1,2474 @@
+% !TeX program  = XeLaTeX
+% !TeX encoding = UTF-8
+%
+% Copyright (C) 2003--2020
+% CTEX.ORG and any individual authors listed elsewhere in this file.
+% --------------------------------------------------------------------------
+%
+% This work may be distributed and/or modified under the
+% conditions of the LaTeX Project Public License, either
+% version 1.3c of this license or (at your option) any later
+% version. This version of this license is in
+%    http://www.latex-project.org/lppl/lppl-1-3c.txt
+% and the latest version of this license is in
+%    http://www.latex-project.org/lppl.txt
+% and version 1.3 or later is part of all distributions of
+% LaTeX version 2005/12/01 or later.
+%
+% This work has the LPPL maintenance status `maintained'.
+%
+% The Current Maintainers of this work are Leo Liu, Qing Lee and Liam Huang.
+%
+% --------------------------------------------------------------------------
+%
+
+\documentclass{ctxdoc}
+
+\GetFileId{ctex.sty}
+
+\title{\bfseries \CTeX{} 宏集手册}
+\author{\href{http://www.ctex.org}{CTEX.ORG}}
+\date{\filedate\qquad\fileversion}
+
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+\CTeX{} 宏集是面向中文排版的通用 \LaTeX{} 排版框架，为中文 \LaTeX{} 文档
+提供了汉字输出支持、标点压缩、字体字号命令、标题文字汉化、中文版式调整、数字
+日期转换等支持功能，可适应论文、报告、书籍、幻灯片等不同类型的中文文档。
+
+\CTeX{} 宏集支持 \LaTeX、\pdfLaTeX、\XeLaTeX、\LuaLaTeX、\upLaTeX{} 等多种不同
+的编译方式，并为它们提供了统一的界面。主要功能由宏包 \pkg{ctex} 和中文文档类
+\cls{ctexart}、\cls{ctexrep}、\cls{ctexbook} 和 \cls{ctexbeamer} 实现。
+\end{abstract}
+
+\tableofcontents
+
+\clearpage
+\setlength{\parskip}{0.8ex}
+
+\begin{documentation}
+
+\section{介绍}
+
+\subsection*{历史}
+
+\CTeX{} 宏集的源头有两个：一是王磊编写的 \cls{cjkbook} 文档类，二是吴凌云编写的
+\file{GB.cap}。
+这些工作没有经过认真、系统的设计，也没有用户文档，不利于维护和改进。
+
+2003 年，吴凌云使用 \pkg{doc} 和 \pkg{DocStrip} 重构了整个工程，并增加了许多新的功能，
+称为 \pkg{ctex} 宏包。2007 年，oseen 和王越在 \pkg{ctex} 宏包的基础上，
+增加了对 UTF-8 编码的支持，开发出了 \pkg{ctexutf8} 宏包。
+
+2009 年 5 月，我们在 Google Code 建立了 ctex-kit 项目^^A
+\footnote{\nolinkurl{http://code.google.com/p/ctex-kit/}}，
+对 \pkg{ctex} 宏包及相关脚本进行了整合，并加入了对 \XeTeX{} 引擎的支持。
+在开发新版本时，考虑到合作开发和调试的方便，我们放弃了 \pkg{doc} 和 \pkg{DocStrip}，
+采取了直接编写宏包代码的方式。
+
+2014 年 3 月，为了适应 \LaTeX{} 的最新发展，特别是 \LaTeXiii{} 的逐渐成熟，李清用
+\LaTeXiii{} 重构了整个宏包的代码，并重新使用 \pkg{doc} 和 \pkg{DocStrip} 工具进行代码
+的管理，升级版本号为 2.0，并改称 \CTeX{} 宏集。
+
+2015 年 3 月，由于 Google Code 即将停止服务，ctex-kit 项目迁移至
+\href{https://github.com/CTeX-org/ctex-kit}{GitHub}^^A
+\footnote{\url{https://github.com/CTeX-org/ctex-kit}}。
+
+最初，Knuth 在设计开发 \TeX{} 的时候没有考虑到多国语言支持，特别是对多字节的中日韩
+语言的支持。这使得 \TeX{} 以至后来的 \LaTeX{} 对中文的支持一直不是很好。即使在
+\pkg{CJK} 宏包解决了中文字符处理的问题以后，中文用户使用 \LaTeX{} 仍然要面对许
+多困难。
+这些困难里，以章节标题的中文化为最。由于中文和西文语言习惯的差异，用户很难使用标准
+文档类中的代码结构来表达中文标题。于是，用户不得不对标准文档类做较大的修改。
+除此之外，日期格式、首行缩进、中文字号和字距等细节问题，也需要精细的调校。
+我们设计 \CTeX{} 宏集的目的之一就是解决这些 \LaTeX{} 文档的汉化难题。
+
+另一方面，随着 \TeX{} 引擎和 \LaTeX{} 宏包的不断发展，\LaTeX{} 的中文支持方式从早期的
+专用系统（如 \pkg{CCT}）发展为适用于不同引擎的多种方式^^A
+\footnote{比如：\pdfTeX{} 引擎下的 \pkg{CJK}、\pkg{zhmCJK}宏包，
+\XeTeX{} 引擎下的 \pkg{xeCJK} 宏包和 \LuaTeX{} 引擎下的 \pkg{LuaTeX-ja} 宏
+包}。这些方式的适用情况和使用方式有不少细节上的差异，同时操作系统的不同、语言环境的不同等
+客观情况又进一步带来了更多的细节差异。我们设计 \CTeX{} 宏集的另一个主要目的就是
+尽可能消除这些差异带来的影响，使用户能够以一个统一的接口来使用不同的中文支持方式，
+使得同一份文档能够在不同环境下交换使用。
+
+\CTeX{} 宏集的许多实现细节离不开热心朋友们在 \url{bbs.ctex.org} 论坛上的讨论，
+在此对参与讨论的朋友们表示感谢。
+
+\subsection*{关于宏集名字的说明}
+
+\CTeX{} 之名是英文单词 China（中国）或 Chinese（中文）的首字母“C”与 “\TeX{}”
+结合而成的。在纯文本环境下，该名字应写作“CTeX”。
+
+\CTeX{} 宏集是由 \href{http://bbs.ctex.org}{\CTeX{} 社区} 发起并维护的
+\LaTeX{} \emph{宏包和文档类的集合}。
+社区另有发布名为 \href{http://www.ctex.org/CTeX}{\CTeX{} 套装}
+的 \TeX{} 发行版，与本文档所述的 \CTeX{} 宏集并非是同一事物。
+
+\pkg{ctex} 则是本宏集中的 \pkg{ctex.sty} 的名字。这一完全小写的名称，在过去
+也被用来指代整个 \CTeX{} 宏集，不过现在则特指 \pkg{ctex.sty} 这一宏包。
+在不引起歧义的情况下，它也可以沿用过去的习惯，代指整个宏集。
+
+\section{简明教程}
+
+\subsection{\CTeX{} 宏集的组成}
+
+为了适应用户不同的需求，我们将 \CTeX{} 宏集的主要功能分散在四个中文文档类和
+三个宏包当中，具体的组成见表~\ref{tab:ctex}。
+
+\begin{table}[htbp]
+\centering
+\caption{\CTeX{} 宏集的组成}\label{tab:ctex}
+\begin{tabularx}{\linewidth}{llX}
+\toprule
+  类别   & 文件 & 说明 \\
+\midrule
+  文档类 & \file{ctexart.cls}  & 标准文档类 \cls{article} 的汉化版本，一般适用于
+                                 短篇幅的文章 \\
+         & \file{ctexrep.cls}  & 标准文档类 \cls{report} 的汉化版本，一般适用于
+                                 中篇幅的报告 \\
+         & \file{ctexbook.cls} & 标准文档类 \cls{book} 的汉化版本，一般适用于
+                                 长篇幅的书籍 \\
+         & \file{ctexbeamer.cls} & 文档类 \cls{beamer} 的汉化版本，适用于
+                                   幻灯片演示 \\
+\midrule
+  宏包   & \file{ctex.sty}     & 提供全部功能，但\emph{默认不开启章节标题设置功能}，
+                                 需要使用 \opt{heading} 选项来开启 \\
+         & \file{ctexsize.sty} & 定义和调整中文字号，在 \pkg{ctex} 宏包
+                                 或 \CTeX{} 中文文档类之外单独调用 \\
+         & \file{ctexheading.sty} & 提供章节标题设置功能（见 \ref{sec:secstyle}
+                                    节），在 \pkg{ctex} 宏包或 \CTeX{} 中文
+                                    文档类之外单独调用 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{\CTeX{} 宏集的安装和更新}
+\label{subsec:easy-ins}
+
+\CTeX{} 宏集依赖的宏包和宏集已被最常见的 \TeX{} 发行版 \TeXLive{} 和 \MiKTeX{}
+所收录。如果本地安装 \TeXLive{} 或 \MiKTeX{} 不是完全版本，就可能需要通过这
+两个发行版提供的\emph{宏包管理器}来安装宏包。
+
+\TeXLive{} 的宏包管理器是 tlmgr。用户可以在系统命令行中^^A
+\footnote{Windows 系统的命令行是 CMD 命令提示符，你可以使用 Win + R 组合键^^A
+打开“运行”对话框，然后输入 cmd 确认打开命令提示符窗口。}^^A
+执行
+\begin{frameverb}
+  tlmgr gui
+\end{frameverb}
+启动管理器的图形界面（Windows 用户也可以通过开始菜单的
+TeX Live 2015 \ding{212} TeX Live Manager 打开）。
+连接上远程仓库之后，搜索 ctex 安装即可。
+tlmgr 的图形界面使用 Perl 编写，容易造成系统假死。遇到这种问题的用户，
+也可以直接在系统命令行执行
+\begin{frameverb}
+  tlmgr install ctex
+\end{frameverb}
+来安装 \CTeX{} 宏集\footnote{*nix 用户可能需要超级用户权限才能正确安装宏集。}。
+
+\MiKTeX{} 的宏包管理器是 mpm (\MiKTeX{} Package Manager)。用户可以在开始菜单
+找到 MiKTeX \ding{212} Maintenance (Admin) \ding{212} Package Manager (Admin)，
+打开管理器，连接上远程仓库之后，搜索 ctex 安装即可。
+
+若希望了解 \CTeX{} 宏集具体的依赖情况和手工安装宏集的方法，
+请参阅第 \ref{sec:dep-ins}~节。
+
+当宏包发布新版本，并被发行版在远程仓库安装之后，在本地就可以通过宏包管理器来
+取得新版本。
+
+对于 \TeXLive{}，可以在 tlmgr 的图形界面点击“更新全部已安装的”按钮或者在
+命令行执行
+\begin{frameverb}
+  tlmgr update --all
+\end{frameverb}
+来完整更新已安装的宏包。
+
+对于 \MiKTeX{}，在开始菜单找到
+MiKTeX \ding{212} Maintenance (Admin) \ding{212} Update (Admin)，
+按照界面说明更新即可。
+
+\subsection{使用 \CTeX{} 文档类}
+
+\emph{如果用户需要在标准文档类的基础上添加中文支持和中文版式支持，我们建议用户使用 \CTeX{}
+宏集提供的四个中文文档类。}
+
+\CTeX{} 宏集提供了四个中文文档类：\cls{ctexart}、\cls{ctexrep}、\cls{ctexbook} 和
+\cls{ctexbeamer}，分别对应 \LaTeX{} 的标准文档类 \cls{article}、\cls{report}、
+\cls{book} 和 \cls{beamer}。使用它们的时候，需要将涉及到的所有源文件使用 UTF-8
+编码保存\footnote{使用 (pdf)\LaTeX{} 时也能够使用 GBK 编码，但不推荐。（见
+\ref{subs:encoding}~节）}。
+
+\begin{ctexexam}
+  \documentclass{ctexart}
+  \begin{document}
+  中文文档类测试。你需要将所有源文件保存为 UTF-8 编码。
+
+  你可以使用 XeLaTeX、LuaLaTeX 或 upLaTeX 编译，也可以使用 (pdf)LaTeX 编译。
+  推荐使用 XeLaTeX 或 LuaLaTeX 编译。
+  \end{document}
+\end{ctexexam}
+
+以下是使用 \cls{ctexbeamer} 文档类编写中文演示文稿的一个示例。
+\begin{ctexexam}
+  \documentclass{ctexbeamer}
+  \begin{document}
+  \begin{frame}{中文演示文档}
+  \begin{itemize}
+    \item 你需要将所有源文件保存为 UTF-8 编码
+    \item 你可以使用 XeLaTeX、LuaLaTeX 或 upLaTeX 编译
+    \item 也可以使用 (pdf)LaTeX 编译
+    \item 推荐使用 XeLaTeX 或 LuaLaTeX 编译
+  \end{itemize}
+  \end{frame}
+  \end{document}
+\end{ctexexam}
+
+\subsection{使用 \pkg{ctex} 宏包}
+
+\emph{用户在使用非标准文档类时，如果需要添加中文支持或中文版式支持，则可以使用 \pkg{ctex}
+宏包。}
+
+有些文档类是建立在 \LaTeX{} 标准文档类之上开发的。这时，给 \pkg{ctex} 宏包
+加上 \opt{heading} 选项，可以将章节标题设置为中文风格。
+\begin{ctexexam}
+  \documentclass{ltxdoc}
+  \usepackage[heading=true]{ctex}
+  \begin{document}
+  \section{简介}
+  章节标题中文化的 \LaTeX{} 手册。
+  \end{document}
+\end{ctexexam}
+
+\section{宏包选项与 \tn{ctexset} 命令}
+\label{sec:options}
+
+\CTeX{} 宏集已经尽可能就中文的行文和版式习惯做了调整和配置，通常而言，这些配置
+已经够用。因此，除非必要，我们不建议普通用户修改这些默认配置。如果你认为 \CTeX{} 宏集
+的默认配置还可以完善，可以在项目主页上%
+\href{https://github.com/CTeX-org/ctex-kit/issues}{提交 issue}，
+向我们反映，我们会酌情在后续版本中予以改进。
+
+不过，\CTeX{} 宏集也提供了一系列选项。用户可以使用这些选项来控制 \CTeX{} 宏集的行为。
+具体来说，这些选项里，有的以传统的方式提供，
+也有的以 \meta{key}|=|\meta{value} 的形式提供。对于以键值对形式提供的选项，
+在下面的说明中使用\textbf{粗体}来表示 \CTeX{} 的默认设置。
+
+另一方面，这些选项可以分为以下三类：
+\begin{itemize}
+\item 名字后带有 \rexptarget\rexpstar{} 号的选项，只能作为宏包/文档类选项，需要
+  在引入宏包/文档类的时候指定；
+\item 名字后带有 \exptarget\expstar{} 号的选项，只能通过 \CTeX{} 宏集提供的
+  用户接口 \tn{ctexset} 来设定；
+\item 名字后不带有特殊符号的选项，既可以作为宏包/文档类选项，也可以通过
+  \tn{ctexset} 来设定。
+\end{itemize}
+后续文档将在使用说明中对某些特殊的选项加以说明。
+
+\begin{function}[added=2014-03-18]{\ctexset}
+  \begin{syntax}
+    \tn{ctexset} \Arg{键值列表}
+  \end{syntax}
+是 \CTeX{} 宏集的通用控制命令，用来在宏包载入后控制宏包的各项功能。
+\tn{ctexset} 的参数是一个键值列表，以通用的接口完成各项设置。
+\end{function}
+
+\tn{ctexset} 的参数是一组由逗号分隔的选项列表，列表中的选项通常是一个
+\meta{key}|=|\meta{value} 格式的定义。例如设置摘要与参考文献标题名称
+（\ref{subs:capname}~节）就可以使用：
+\begin{ctexexam}[labelref=exam:capname]
+  \ctexset{
+    abstractname = {本文概要},
+    bibname      = {文\quad 献}
+  }
+\end{ctexexam}
+
+\tn{ctexset} 采用 \LaTeXiii{} 风格的键值设置，支持不同类型的选项与层次化的选
+项设置，相关示例见 \ref{sec:secstyle}~节。
+
+\section{编译方式、编码与中文字库}
+\label{sec:chinese}
+
+\subsection{编译方式}
+\label{subs:compile}
+
+\CTeX{} 宏集会根据用户使用的编译方式\footnote{\LaTeX、\pdfLaTeX、\XeLaTeX、
+\LuaLaTeX{} 及 \upLaTeX。}，在底层选择不同的中文支持方式（见
+表~\ref{tab:chinese-support}）。
+
+\begin{table}[htbp]
+\centering
+\begin{threeparttable}
+\caption{\CTeX{} 宏集的中文支持方式}
+\label{tab:chinese-support}
+\begin{tabular}{*6c}
+  \toprule
+  编译方式 & (pdf)\LaTeX & \XeLaTeX & \LuaLaTeX & \upLaTeX\tnote{*} \\
+  \midrule
+  支持宏包 & \pkg{CJK} & \pkg{xeCJK} & \pkg{LuaTeX-ja} & 原生 \\
+  \bottomrule
+\end{tabular}
+\begin{tablenotes}
+\item[*] p\LaTeX-ng（或称 \ApLaTeX）与 \upLaTeX{} 兼容。使用 p\LaTeX-ng 编译
+时，\pkg{ctex} 采用与 \upLaTeX{} 相同的设置。
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+不同的编译方式和中文支持方式会在一定程度上影响 \CTeX{} 宏集的行为，比如宏包对
+文档编码、字体选择、空格、标点等的处理。具体细节将在本文档后续内容中进行阐述。
+
+\subsection{中文编码}
+\label{subs:encoding}
+
+\begin{function}[rEXP,updated=2019-11-10]{GBK, UTF8}
+  指明编写文档时使用的编码。\CTeX{} 宏集无法检测文档实际的编码格式，因此需要
+  用户通过选项声明。如果没有显式指定，则默认采用 UTF-8 编码。
+
+  使用 \XeLaTeX{}、\LuaLaTeX{} 或 \upLaTeX{} 编译时，\CTeX{} 宏集强制使用
+  UTF-8 编码，此时 \opt{GBK} 选项无效；使用 (pdf)\LaTeX{} 编译时，用户可以
+  显式声明 \opt{GBK} 选项，使 \CTeX{} 宏集按 GBK 编码处理文档。用户需要^^A
+  \emph{保证编译方式、源文件编码、宏包编码选项三者一致}。
+
+  \emph{我们建议用户编写新文档时始终使用 UTF-8 编码，而仅把 GBK 编码留给
+  历史遗留文档。}
+\end{function}
+
+\subsection{中文字库}
+\label{subs:options-CJK-font}
+
+以往，为 \LaTeX{} 文档配置中文支持是一件相当繁琐的事情。默认情况下，
+\CTeX{} 宏集能自动检测用户使用的编译方式（参见 \ref{subs:compile}~节）和
+操作系统\footnote{\CTeX{} 宏集现在能够识别 Mac~OS~X 系统以及 Windows 系统。}，
+选择合适的底层支持和字库，从而简化配置过程。自动配置的情况参见
+表~\ref{tab:default-font-select}。
+
+\begin{table}[htbp]
+\centering
+\begin{threeparttable}
+\caption{\CTeX{} 宏集自动配置字体策略}
+\label{tab:default-font-select}
+\begin{tabular}{*{5}{c}}
+  \toprule
+             & macOS & Windows New\tnote{1} & Windows Old\tnote{2} &
+              其他 \\
+  \midrule
+  \XeLaTeX{} & \makecell{\pkg{xeCJK}\\华文字库} &
+    \makecell{\pkg{xeCJK}\\中易字库 + 微软雅黑} & \makecell{\pkg{xeCJK}\\中易字库} &
+    \makecell{\pkg{xeCJK}\\Fandol 字库\tnote{3}} \\
+  \cmidrule(lr){1-5}
+  \LuaLaTeX{}\tnote{4} & \makecell{\pkg{LuaTeX-ja}\\华文字库} &
+    \makecell{\pkg{LuaTeX-ja}\\中易字库 + 微软雅黑} &
+    \makecell{\pkg{LuaTeX-ja}\\中易字库} &
+    \makecell{\pkg{LuaTeX-ja}\\Fandol 字库} \\
+  \cmidrule(lr){1-5}
+  \pdfLaTeX{} & 不可用\tnote{5} &
+    \makecell{\pkg{CJK} + \pkg{zhmetrics}\\中易字库 + 微软雅黑} &
+    \makecell{\pkg{CJK} + \pkg{zhmetrics}\\中易字库} & 不可用\tnote{5} \\
+  \cmidrule(lr){1-5}
+  \makecell{\LaTeX{} + \\\dvipdfmx{}} & 不可用\tnote{6} &
+    \makecell{\pkg{CJK} + \pkg{zhmetrics}\\中易字库 + 微软雅黑} &
+    \makecell{\pkg{CJK} + \pkg{zhmetrics}\\中易字库} &
+    \makecell{\pkg{CJK} + \pkg{zhmetrics}\\Fandol 字库} \\
+  \cmidrule(lr){1-5}
+  \makecell{\upLaTeX{} + \\\dvipdfmx{}} & 不可用\tnote{6} &
+    \makecell{\pkg{zhmetrics-uptex}\\中易字库 + 微软雅黑} &
+    \makecell{\pkg{zhmetrics-uptex}\\中易字库} &
+    \makecell{\pkg{zhmetrics-uptex}\\Fandol 字库} \\
+  \bottomrule
+\end{tabular}
+\begin{tablenotes}
+  \item [1] Windows Vista 及以后的 Windows 操作系统。
+  \item [2] Windows XP 及以前的 Windows 操作系统。
+  \item [3] 由马起园、苏杰、黄晨成等人开发的开源中文字体，
+    参见：\url{https://github.com/clerkma/fandol-fonts}。
+  \item [4] \LuaLaTeX{} 编译时使用 \pkg{LuaTeX-ja} 宏包。对此，
+    第 \ref{sec:lualatex-chinese}~节有特别说明。
+  \item [5] 受 \pdfTeX{} 的限制，无法嵌入 OpenType 字体。
+  \item [6] 目前受 \dvipdfmx{} 的限制，macOS 系统上的黑体和仿宋无法读取。
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+通常，由 \CTeX{} 宏集进行的自动配置已经足够使用，无需用户手工干预；但
+是 \CTeX{} 仍然提供了一系列选项，供在 \CTeX{} 的自动选择机制因为
+意外情况失效，或者在用户有特殊需求的情况下使用。\emph{除非必要，用户不
+应使用这些选项。}
+
+\begin{function}[rEXP,updated=2014-03-08]{zhmap}
+  \begin{syntax}
+    zhmap = <\TTF|zhmCJK>
+  \end{syntax}
+  指定字体映射机制。本选项只在使用 \pdfLaTeX/\LaTeX{} 编译时有意义。
+\end{function}
+\begin{optdesc}
+  \item[true] 使用 \pkg{zhmetrics} 宏包，将 CJK 字库通过 \tn{special}
+  命令映射到 \file{.ttf} 文件。
+
+  \item[false] 使用传统的 CJK 字库（Type 1）^^A
+  \footnote{如果需要使用自定义的字体映射文件，或者希望使用 Type1 字库，请禁用本选项。}。
+
+  \item[zhmCJK] 载入 \pkg{zhmCJK} 宏包^^A
+  \footnote{\pkg{zhmCJK} 宏包基于 \pkg{zhmetrics} 和 \pkg{CJK} 宏包，提供与
+  \pkg{xeCJK} 宏包类似的用户接口。}^^A
+  ，由 \pkg{zhmCJK} 宏包提供从 CJK 字库到 \file{.ttf} 的映射。
+\end{optdesc}
+
+\begin{function}[added=2014-03-08]{fontset}
+  \begin{syntax}
+    fontset = <adobe|fandol|founder|mac|macnew|macold|ubuntu|windows|none|...>
+  \end{syntax}
+  指定 \CTeX{} 宏集加载的字库。
+
+  如果没有指定 \opt{fontset} 的值，\CTeX{} 宏集将自动检测用户使用的操作系统，配置
+  相应的字体（参见表~\ref{tab:default-font-select}）。
+\end{function}
+
+\CTeX{} 预定义了以下六种中文字库。
+
+\begin{optdesc}
+  \item[adobe] 使用 Adobe 公司的四款中文字体，\emph{不支持 \pdfLaTeX}。
+  \item[fandol] 使用 Fandol 中文字体，\emph{不支持 \pdfLaTeX}。
+  \item[founder] 使用方正公司的中文字体。
+  \item[mac] 使用 macOS 系统下的字体，\emph{不支持 \pdfLaTeX}，根据版本分为
+    |macnew| 和 |macold| 两种。
+  \item[macnew] 使用 El Capitan 或之后的多字重华文字体和苹方字体。
+  \item[macold] 使用 Yosemite 或之前的华文字体。
+  \item[ubuntu] 使用 Ubuntu 系统下的思源宋体、思源黑体和 \TeX{} 发行版自带的
+    文鼎楷体，\emph{不支持 \pdfLaTeX}。
+  \item[windows] 使用 Windows 系统下的中易字体和微软雅黑字体。
+\end{optdesc}
+
+注意：使用 (pdf)\LaTeX{} 编译的时候，若设置 \opt{zhmap = false}（比如需要
+使用 \LaTeX{} + Dvips 编译），则需要按照传统方式^^A
+\footnote{可以使用 \pkg{zhmetrics} 宏包提供的脚本
+\href{https://github.com/CTeX-org/ctex-kit/blob/master/zhmetrics/CTeXFonts.lua}
+{\file{CTeXFonts.lua}}。}^^A
+在本地安装好 CJK 字体。
+
+如果不想使用 \CTeX{} 预定义的中文字库，可以设置 \opt{fontset} 为下述值之一。
+
+\begin{optdesc}
+  \item[none] 不配置中文字体，需要用户自己配置。
+  \item[\meta{name}] 这里 \meta{name} 为自定义的名字。
+  \CTeX{} 宏集将载入名为 |ctex-fontset-|\meta{name}|.def| 的文件作为字体配置
+  文件。因此，请先保证文件的存在。可以在当前工作目录或者本地 \texttt{TDS} 目录
+  树下合适位置建立一个名为 |ctex-fontset-|\meta{name}|.def| 的文件，在这个文件
+  里面自定义中文字体。然后通过使用 |fontset=|\meta{name} 选项来调用它。字体配置
+  文件的具体写法可以参考 \CTeX{} 宏集 \texttt{fontset} 目录下的字体配置文件。
+\end{optdesc}
+
+注意：\emph{如果希望使用 \tn{ctexset} 在导言区指定字库，则需要先在宏包/文档类选项中指定
+\opt{fontset = none}}。例如：
+\begin{ctexexam}
+  \documentclass[fontset = none]{ctexart}
+  \ctexset{fontset = founder}
+  \begin{document}
+  在文档类选项中声明 \verb|fontset = none|，随后在导言区用 \verb|\ctexset|
+  指定字体。
+  \end{document}
+\end{ctexexam}
+
+\CTeX{} 宏集预定义的中文字库还定义了一些字体命令。除了在 \opt{ubuntu} 字库中没有
+\tn{fangsong} 的定义外，所有字库都有以下四个字体命令：
+\begin{optdesc}
+  \item[\tn{songti}] 宋体，CJK 等价命令 |\CJKfamily{zhsong}|。
+  \item[\tn{heiti}] 黑体，CJK 等价命令 |\CJKfamily{zhhei}|。
+  \item[\tn{fangsong}] 仿宋，CJK 等价命令 |\CJKfamily{zhfs}|。
+  \item[\tn{kaishu}] 楷书，CJK 等价命令 |\CJKfamily{zhkai}|。
+\end{optdesc}
+在 \opt{windows}、\opt{founder} 和 \opt{macnew} 字库中，额外定义了 \tn{lishu}
+和 \tn{youyuan}：
+\begin{optdesc}
+  \item[\tn{lishu}] 隶书，CJK 等价命令 |\CJKfamily{zhli}|。
+  \item[\tn{youyuan}] 圆体，CJK 等价命令 |\CJKfamily{zhyou}|。
+\end{optdesc}
+在 \opt{windows} 字库中还定义了 \tn{yahei}。出于兼容性的考虑，\tn{yahei} 命令
+在 \opt{macnew} 字库中也有定义，但实际调用苹方黑体：
+\begin{optdesc}
+  \item[\tn{yahei}] 微软雅黑，CJK 等价命令 |\CJKfamily{zhyahei}|。
+\end{optdesc}
+在 \opt{macnew} 字库中，还定义了 \tn{pingfang}：
+\begin{optdesc}
+  \item[\tn{pingfang}] 苹方黑体，CJK 等价命令 |\CJKfamily{zhpf}|。
+\end{optdesc}
+
+\section{排版格式设定}
+\label{sec:format-settings}
+\subsection{文档默认字号}
+\label{subs:options-class}
+
+\begin{function}[rEXP,added=2015-05-06]{zihao}
+  \begin{syntax}
+    zihao = <-4|5|false>
+  \end{syntax}
+  将文章默认字号（\tn{normalsize}）设置为小四号字或五号字，
+  具体情况见表 \ref{tab:fontsize}。\opt{false} 禁用本功能。
+  本选项可以用于四个 \CTeX{} 文档类和 \pkg{ctex} 宏包，
+  也可以用于 \pkg{ctexsize} 宏包。
+
+  \opt{scheme = chinese} 时，对标准文档类默认值为 |5|，即设置
+  \tn{normalsize} 为五号字；对 \cls{beamer} 则为 |false|，使用文档类原有的设
+  置。
+\end{function}
+
+\begin{table}[htbp]
+\centering
+\setlength\tabcolsep{1em}
+\caption{标准字体命令与字号的对应}\label{tab:fontsize}
+\begin{tabular}{l*2{c>{\ttfamily}r}*3{>{\ttfamily}c}}
+\toprule
+& \multicolumn2c{|zihao = 5|} & \multicolumn2c{|zihao = -4|} &
+\multicolumn1c{|10pt|} & \multicolumn1c{|11pt|} & \multicolumn1c{|12pt|} \\
+\cmidrule(lr){2-3} \cmidrule(lr){4-5}
+\cmidrule(lr){6-6} \cmidrule(lr){7-7} \cmidrule(lr){8-8}
+字体命令        & 字号 & \si{bp} & 字号 & \si{bp}
+                       & \si{pt} & \si{pt} & \si{pt} \\
+\midrule
+|\tiny|         & 七号 & 5.5  & 小六 & 6.5  & ~5 & ~6 & ~6 \\
+|\scriptsize|   & 小六 & 6.5  & 六号 & 7.5  & ~7 & ~8 & ~8 \\
+|\footnotesize| & 六号 & 7.5  & 小五 & 9~~  & ~8 & ~9 & 10 \\
+|\small|        & 小五 & 9~~  & 五号 & 10.5 & ~9 & 10 & 11 \\
+|\normalsize|   & 五号 & 10.5 & 小四 & 12~~ & 10 & 11 & 12 \\
+|\large|        & 小四 & 12~~ & 小三 & 15~~ & 12 & 12 & 14 \\
+|\Large|        & 小三 & 15~~ & 小二 & 18~~ & 14 & 14 & 17 \\
+|\LARGE|        & 小二 & 18~~ & 二号 & 22~~ & 17 & 17 & 20 \\
+|\huge|         & 二号 & 22~~ & 小一 & 24~~ & 20 & 20 & 25 \\
+|\Huge|         & 一号 & 26~~ & 一号 & 26~~ & 25 & 25 & 25 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{function}[rEXP]{10pt, 11pt, 12pt}
+  \CTeX{} 文档类是在 \LaTeX{} 标准文档类之上开发的。因此，除了可以使用 \CTeX{}
+  宏包定义的字号选项之外，还可以使用标准文档类的同类选项（\opt{10pt}、\opt{11pt}
+  和 \opt{12pt}）。在使用这些来自标准文档类的选项的时候，\CTeX{} 文档类的字号
+  选项会被抑制。亦即，在 \opt{zihao} 选项之后设置 \opt{10pt} 选项，
+  \opt{zihao} 选项将不再起作用。
+\end{function}
+
+标准文档类的其他选项在 \CTeX{} 文档类中依旧有效。例如，设置纸张大小和方向的
+\opt{a4paper} 和 \opt{landscape}，设置单双面的 \opt{oneside} 和
+\opt{twoside} 等。\CTeX{} 会将这些选项传给标准文档类^^A
+\footnote{事实上，\LaTeX{} 在文档类中的选项是全局设定的，除了对使用的文档类有
+影响外，也可能会影响到随后使用的宏包。如果这些宏包中有某些选项出现在文档类的
+选项列表中，那么该选项将会被自动激活。}。
+
+\subsection{章节标题风格}
+\label{subs:options-heading}
+
+\begin{function}[rEXP,added=2014-03-08]{heading}
+  \begin{syntax}
+    heading = <\TFF>
+  \end{syntax}
+  本选项只能在调用 \pkg{ctex.sty} 时作为宏包选项使用。
+
+  \CTeX{} 宏集提供了一套用于修改文档章节标题格式的接口。该选项用于选择是否
+  启用该功能。详细的设置方法请参见
+  \ref{sec:secstyle}~节和 \ref{subs:pagestyle}~节。
+\end{function}
+
+\CTeX{} 宏集提供的四个文档类总是启用该功能。如果在 \pkg{ctex.sty} 下启用该选项，
+将会检查当前是否使用 \LaTeX{} 标准文档类。
+若然，则该选项将会使得 \pkg{ctex.sty} 宏包的行为和 \CTeX{} 宏集提供的
+四个中文文档类\emph{完全}一致；若不然，则会根据 \tn{chapter}
+是否有定义来使用 \cls{ctexbook} 或者 \cls{ctexart} 的标题设置。
+
+\begin{function}[rEXP]{sub3section, sub4section}
+  修改 \tn{paragraph} 和 \tn{subparagraph} 的格式。
+
+  默认情况下，\tn{paragraph} 和 \tn{subparagraph} 会将标题与随后的正文
+  排版在同一个段落。启用 \opt{sub3section} 会将 \tn{paragraph} 的格式修改为
+  类似 \tn{section} 的格式，并将 \tn{subparagraph} 的格式修改为原本 \tn{paragraph}
+  的格式。启用 \opt{sub4section} 会将 \tn{paragraph} 和 \tn{subparagraph} 的格式
+  都修改为类似 \tn{section} 的格式。
+
+  启用该选项通常需要将计数器 |secnumdepth| 的值为设置为 4 或 5。
+
+  具体格式可参考 \ref{sec:secstyle}~节中的 \opt{runin} 和 \opt{afterskip} 选项。
+
+  注意，上述两个选项只有在非 \cls{beamer} 文档类下 \opt{heading} 选项启用的时候
+  才有意义。亦即，只有在使用除了 \cls{ctexbeamer} 的三个 \CTeX{} 文档类或启用了
+  \opt{heading} 的 \pkg{ctex.sty} 的时候才有意义。
+\end{function}
+
+\subsection{排版方案选项}
+\label{subs:options-type-style}
+
+\begin{function}[rEXP,added=2015-04-15]{scheme}
+  \begin{syntax}
+    scheme = <(chinese)|plain>
+  \end{syntax}
+  选择文章的排版方案，预设有 \opt{chinese} 和 \opt{plain} 两种方案。%
+\end{function}
+  \begin{optdesc}[itemsep=\medskipamount]
+    \item[chinese] 对 \cls{beamer} 以外的文档类，调整默认字号为五号字，并调
+      整行距为 |1.3|；汉化文档中的标题名字（如“图”、“表”、“目录”和“参
+      考文献”等，见 \ref{subs:capname}~节）；
+      在 \opt{heading = true} 的情况下^^A
+      \footnote{使用 \CTeX{} 文档类，或者使用 \pkg{ctex} 宏包且开启该选项时。}^^A
+      （\ref{subs:options-heading}~节），还会将章节标题的风格修改为
+      中文样式（见 \ref{sec:secstyle}~节）。
+
+      当关闭 \opt{heading} 选项的 \pkg{ctex} 宏包与标准文档类或其衍生文档类
+      联用时，会载入 \pkg{indentfirst} 宏包，以实现章节标题后的段首缩进。
+    \item[plain] 不调整默认字号和行距，不会汉化文档中的标题名字，也不会将章节
+      标题风格修改为中文样式，同时不会调整 \tn{pagestyle}，并禁用 \opt{autoindent}
+      选项。事实上，此时的 \CTeX{} 宏集只提供了中文支持功能，而不对文章版式进行任何修改。
+  \end{optdesc}
+
+\begin{function}[updated=2014-04-11]{punct}
+  \begin{syntax}
+    punct = <(quanjiao)|banjiao|kaiming|CCT|plain>
+  \end{syntax}
+  设置标点处理格式。预定义好的格式有：
+\end{function}
+  \begin{optdesc}
+    \item[quanjiao] 全角式：所有标点占一个汉字宽度，相邻两个标点占 1.5 汉字宽度；
+    \item[banjiao]  半角式：所有标点占半个汉字宽度；
+    \item[kaiming]  开明式：句末点号^^A
+      \footnote{标点符号分为标号与点号。点号分为两类，一共七种：句末点号有^^A
+      句号、问号和叹号；句内点号有逗号、顿号、冒号和分号。}用占一个汉字宽度，标^^A
+      号和句内点号占半个汉字宽度；
+    \item[CCT]   CCT 式：所有标点符号的宽度略小于一个汉字宽度；
+    \item[plain] 原样（不调整标点间距）。
+  \end{optdesc}
+
+\begin{function}[updated=2014-03-08]{space}
+  \begin{syntax}
+    space = <\TF|(auto)>
+  \end{syntax}
+  是否在生成的 PDF 中保留汉字后面的空格。
+\end{function}
+
+\begin{optdesc}
+  \item[true] 总是保留汉字后的空格。此时，用户需要自行在行尾加上~|%|~处理换行产生
+    的空格\footnote{\LaTeX{} 将单个换行视作一个空格。}。
+  \item[false] 总是忽略掉汉字后面的空格，不论汉字后是什么（使用 (pdf)\LaTeX{}
+    编译时）；等同于 \opt{auto} 的效果（使用 \XeLaTeX{} 编译时）。不建议使用该选项。
+  \item[auto] 根据空格后面的情况决定是否保留：如果空格后面是汉字，则忽略该
+  空格，否则保留。
+\end{optdesc}
+
+  例如，使用
+  \begin{ctexexam}
+  \ctexset{space=true}
+  汉字 分词
+  技术 English
+  \end{ctexexam}
+  将得到“{\ctexset{space=true}汉字 分词 技术 English}”；使用
+  \begin{ctexexam}
+  \ctexset{space=auto}
+  汉字 分词
+  技术 English
+  \end{ctexexam}
+  则会得到“{\ctexset{space=auto}汉字 分词 技术 English}”。
+
+\emph{使用 \textup{\LuaLaTeX{} 及 \upLaTeX} 编译的时候，该选项无效：汉字间的
+空格以及汉字与西文字符之间的空格总是有效，不会被忽略，但可以自动忽略掉由换行
+产生的空格。}
+
+\begin{function}[rEXP,added=2014-04-23]{linespread}
+  \begin{syntax}
+    linespread = <数值>
+  \end{syntax}
+  接受一个浮点数值，设置行距倍数。本选项的初始值与 \opt{scheme} 有关。
+\end{function}
+\begin{optdesc}
+  \item[scheme = chinese] 对标准文档类初始值为 $1.3$，即 $1.3$ 倍行距。此
+  时，相邻两行的基线（\tn{baselineskip}）距离为 $1.3\times 1.2=1.56$ 倍字体
+  高度。对 \cls{beamer} 不改变行距，即使用默认的单倍行距。
+
+  \item[scheme = plain] \CTeX{} 宏集默认不调整行距倍数，文档中的行距由所选文档类和
+  其他宏包或用户设置决定。
+\end{optdesc}
+
+\begin{function}[added=2014-03-13]{autoindent}
+  \begin{syntax}
+    autoindent = <\TTF|数值|带单位的数值>
+  \end{syntax}
+  在字体大小发生变化时，是否自动调整段首缩进（\tn{parindent}）的大小。
+\end{function}
+\begin{optdesc}
+  \item[\meta{数值或带单位的数值}] 用于设置段首缩进的长度。如果不带单位，则默认
+  单位是单个汉字字宽 \tn{ccwd}；如果带单位，则使用该单位。
+
+  \item[true] 等价于设置 \opt{autoindent = 2}。
+
+  \item[false] 禁用自动调整功能，可以设置固定长度的段首缩进。如设置每段缩进 40 点：
+  \begin{ctexexam}
+  \ctexset{autoindent=false}
+  \setlength\parindent{40pt}
+  \end{ctexexam}
+\end{optdesc}
+
+\begin{function}[EXP,added=2014-03-26]{linestretch}
+  \begin{syntax}
+    linestretch = <数值或长度>
+  \end{syntax}
+  \opt{linestretch} 是一个比较特殊的选项，它用来设置汉字之间弹性间距的弹性程
+  度。如果有单位，则可以在选项中直接写；如果是数字，单位则是汉字宽度
+  \tn{ccwd} 的倍数。
+\end{function}
+
+  如果行宽不是汉字宽度的整数倍，为了让段落左右两端对齐，自然就要求伸展汉字之
+  间的间距，而 \opt{linestretch} 选项就是设置每行总的允许伸行量。初始值是允
+  许每行伸行一个汉字的宽度 \tn{ccwd}，并且此宽度能根据字号变化动态调整。
+
+  过小的 \opt{linestretch} 可能导致段落文字右侧可能参差不齐；较大的
+  \opt{linestretch} 选项则可以帮助拥有较长不可断行内容的复杂段落方便地断行，
+  而不会产生大量编译警告；但很大的 \opt{linestretch} 则会掩盖段落不良断行产
+  生的坏盒子警告。
+
+  如果将 \opt{linestretch} 选项的值设置为 \tn{maxdimen}，则可以禁止按字号自
+  动修改每行的允许伸长量。此时汉字间的弹性间距则固定为 \tn{baselineskip} 的
+  $0.08$ 倍。
+
+\section{文档汉化}
+\label{sec:chinese-localization}
+\subsection{日期汉化}
+
+\CTeX 宏包对显示当前日期的 \tn{today} 命令进行了汉化，使之以中文的方式显示今
+天的日期。如编译本文档的日期就是“\today”。
+
+\begin{function}[EXP]{today}
+  \begin{syntax}
+    today = <(small)|big|old>
+  \end{syntax}
+该选项用来控制 \tn{today} 命令的输出格式：
+\begin{optdesc}
+  \item[small] \ctexset{today=small}
+    效果为“\today”。使用阿拉伯数字和汉字的日期格式。
+  \item[big] \ctexset{today=big}
+    效果为“\today”。使用全汉字的日期格式。
+  \item[old] \ctexset{today=old}
+    效果为“\today”。使用文档原来的（英文）日期格式。
+\end{optdesc}
+\end{function}
+
+设置日期格式使用 \tn{ctexset} 命令完成，例如设置全汉字的日期格式：
+\begin{ctexexam}
+  \ctexset{today=big}
+\end{ctexexam}
+
+\CTeX 宏包的中文日期功能实际上是调用 \pkg{zhnumber} 宏包完成的。如果需要更
+多有关日期、时间的命令和更复杂的设置，可以查阅 \pkg{zhnumber} 宏包的文档。
+
+\subsection{文档标题汉化}
+\label{subs:capname}
+
+这里主要介绍由宏包 \opt{scheme} 选项（\ref{subs:options-type-style}~节）控制
+的文档标题汉化功能。
+
+设置文档标题名的示例可见例~\ref{exam:capname}。下面的选项（如
+\opt{contentsname}）主要用来重新定义与选项同名的宏（如 \tn{contentsname}）的
+定义。
+
+\begin{defaultcapconfig}
+
+\begin{function}[EXP]{contentsname}
+  \begin{syntax}
+    contentsname = <名字>
+  \end{syntax}
+设置目录标题名 \tn{contentsname}。中文默认为“\contentsname”。
+\end{function}
+
+\begin{function}[EXP]{listfigurename}
+  \begin{syntax}
+    listfigurename = <名字>
+  \end{syntax}
+设置插图目录标题名 \tn{listfigurename}。中文默认为“\listfigurename”。
+\end{function}
+
+\begin{function}[EXP]{listtablename}
+  \begin{syntax}
+    listtablename = <名字>
+  \end{syntax}
+设置表格目录标题名 \tn{listtablename}。中文默认为“\listtablename”。
+\end{function}
+
+\begin{function}[EXP]{figurename}
+  \begin{syntax}
+    figurename = <名字>
+  \end{syntax}
+设置图片环境标题名 \tn{figurename}。中文默认为“\figurename”。
+\end{function}
+
+\begin{function}[EXP]{tablename}
+  \begin{syntax}
+    tablename = <名字>
+  \end{syntax}
+设置表格环境标题名 \tn{tablename}。中文默认为“\tablename”。
+\end{function}
+
+\begin{function}[EXP]{abstractname}
+  \begin{syntax}
+    abstractname = <名字>
+  \end{syntax}
+设置摘要 \env{abstract} 环境标题名 \tn{abstractname}。中文默认
+为“\abstractname”。注意 \cls{book} 类没有摘要，该选项无效。
+\end{function}
+
+\begin{function}[EXP]{indexname}
+  \begin{syntax}
+    indexname = <名字>
+  \end{syntax}
+设置索引标题名 \tn{indexname}。中文默认为“\indexname”。
+\end{function}
+
+\begin{function}[EXP]{appendixname}
+  \begin{syntax}
+    appendixname = <名字>
+  \end{syntax}
+设置附录标题名 \tn{appendixname}。中文默认为“\appendixname”。
+\end{function}
+
+\begin{function}[EXP]{bibname}
+  \begin{syntax}
+    bibname = <名字>
+  \end{syntax}
+设置参考文献标题名 \tn{refname}（对 \cls{article}）或 \tn{bibname}（对
+\cls{report}、\cls{book} 和 \cls{beamer}）。中文默认为“\refname”。
+\end{function}
+
+\begin{function}[EXP]{proofname}
+  \begin{syntax}
+    proofname = <名字>
+  \end{syntax}
+设置证明环境的名称 \tn{proofname}。中文默认为“\proofname”。
+\end{function}
+
+如果使用 \cls{ctexbeamer} 文档类或者在 \cls{beamer} 文档类下使用 \pkg{ctex} 包，
+还会汉化常用定理类环境的诸如“定义”、“定理”和“引理”等名称。此时，还有下列
+三个选项。
+
+\begin{function}[EXP]{refname}
+  \begin{syntax}
+    refname = <名字>
+  \end{syntax}
+设置参考文献标题名 \tn{refname}。中文默认为“\refname”。
+\end{function}
+
+\begin{function}[EXP]{algorithmname}
+  \begin{syntax}
+    algorithmname = <名字>
+  \end{syntax}
+设置算法环境标题名 \tn{algorithmname}。中文默认为“算法”。
+\end{function}
+
+\begin{function}[EXP]{continuation}
+  \begin{syntax}
+    continuation = <名字>
+  \end{syntax}
+设置 \cls{beamer} 可断页的帧在续页标题中的延续标识 \tn{insertcontinuationtext}。
+中文默认为“（续）”。
+\end{function}
+
+\end{defaultcapconfig}
+
+\subsection{页面格式设置与汉化}
+\label{subs:pagestyle}
+
+当使用了 \CTeX 的文档类或是用 \pkg{ctex} 宏包加载了 \opt{heading} 选项时，会
+设置整个文档的页面格式（page style）为 |headings|，即相当于设置了
+\begin{frameverb}
+  \pagestyle{headings}
+\end{frameverb}
+在页眉中显示当前章节的编号与标题。
+
+同时，\CTeX 宏包也会对默认的 |headings| 页面格式进行修改，使之调用
+\tn{CTEXthechapter}、\tn{CTEXthesection} 等宏来正确显示中文的章节编号。
+
+\CTeX 宏包的默认页面格式设置是经过汉化的 |headings|，其基本效果如本文档所
+示，只在页眉一侧显示章节编号和标题，另一侧显示页码。
+
+更复杂的页面格式可以通过调用 \pkg{fancyhdr}、\pkg{titleps} 等宏包来设
+置。\CTeX 宏包同时也为这些自定义页面格式
+的包提供了以下宏供使用：
+\begin{itemize}
+\item \tn{CTEXthechapter}、\tn{CTEXthesection} 等章节编号（见
+\ref{sec:secstyle} 节）。它们用来代替英文文档类中的
+\tn{thechapter}、\tn{thesection} 等宏。
+
+\item \tn{leftmark}、\tn{rightmark}，它们是在使用章节标题命令后，自动设置的
+宏。它们实际是在与章节标题命令对应的标记命令
+\tn{chaptermark}、\tn{sectionmark} 中调用 \tn{markright} 或 \tn{markboth} 生
+成的。
+\end{itemize}
+有关 \LaTeX 页面标记的涵义与使用细节，已经超出了本文档讨论的范围。可以参考
+\cite[Chapter~23]{knuthtex1986}、\cite[\S4.3, \S4.4]{mittelbach2004} 等书籍。
+
+这里举一个例子，说明通过重定义 \tn{sectionmark}，在 \cls{ctexart} 文档类中的
+标准 |headings| 页面格式下控制页眉的方式：
+\begin{ctexexam}
+  \documentclass{ctexart}
+  \pagestyle{headings}
+  \ctexset{section={
+      name={第,节},
+      number=\arabic{section},
+    }
+  }
+  \renewcommand\sectionmark[1]{%
+    \markright{\CTEXifname{\CTEXthesection——}{}#1}}
+
+  \begin{document}
+
+  \section{天地玄黄}
+  \newpage
+
+  \section{宇宙洪荒}
+
+  \end{document}
+\end{ctexexam}
+在上例中，我们设置了页眉的形式是用破折号分开的节编号与节标题，即“第 1 节
+——天地玄黄”、“第 2 节——宇宙洪荒”。
+
+\CTeX 宏包已经对 \pkg{fancyhdr} 宏包进行了补丁，载入 \pkg{fancyhdr} 后，其
+|fancy| 页面格式将使用 \tn{CTEXthechapter} 等宏显示中文章节编号。
+
+关于 \pkg{fancyhdr} 的具体用法可以参见其宏包手册。通常也只要像在标准的英文文
+档类中使用 \pkg{fancyhdr} 一样定义页眉页脚格式即可，并不需要额外的定义。
+
+下面我则给出一个与前例类似而稍复杂的例子，展示如何在文档中设置页眉内容与页眉
+的格式。
+\begin{ctexexam}
+  \documentclass{ctexart}
+  \ctexset{section={
+      name={第,节},
+      number=\arabic{section},
+    }
+  }
+  \usepackage{fancyhdr}
+  \fancyhf{}
+  \lhead{\textnormal{\kaishu\rightmark}}
+  \rhead{--\ \thepage\ --}
+  \pagestyle{fancy}
+  % \sectionmark 的重定义需要在 \pagestyle 之后生效
+  \renewcommand\sectionmark[1]{%
+    \markright{\CTEXifname{\CTEXthesection——}{}#1}}
+
+  \begin{document}
+
+  \section{天地玄黄}
+  \newpage
+
+  \section{宇宙洪荒}
+
+  \end{document}
+\end{ctexexam}
+本例的页眉效果大致如下（有页眉线）：
+\begin{trivlist}\item
+\textnormal{\kaishu 第 1 节——天地玄黄}\hfill -- 1 --\par
+\smallskip\hrule
+\end{trivlist}
+
+\section{章节标题格式设置}
+\label{sec:secstyle}
+
+\CTeX 宏包对 \LaTeX 的标准文档类（\cls{article}、\cls{report} 和
+\cls{book}）和 \cls{beamer} 进行了扩充。当以 \opt{heading} 选项调用 \CTeX
+宏包时（\ref{subs:options-heading}~节），则会启用章
+节标题的格式设置功能。本节就来介绍有关章节标题的格式选项，所有选项使用
+\tn{ctexset} 命令设置。
+
+第 \ref{subs:pagestyle} 节和本节介绍的功能已经被提取到 \pkg{ctexheading}
+宏包之中，可以在 \pkg{ctex} 宏包和 \cls{ctexart} 等文档类之外独立使用。
+各选项的默认值与 \opt{scheme = plain} 时的情形相同。
+
+章节标题的格式选项是分层设置的。顶层的选项是章节标题名称，次一级的选项是章节
+标题的格式。章节标题名包括 |part|, |chapter|, |section|, |subsection|,
+|subsubsection|, |paragraph|, |subparagraph|；而可用的格式包括 \opt{numbering},
+\opt{name}, \opt{number}, \opt{format}, \opt{nameformat}, \opt{numberformat},
+\opt{aftername}, \opt{titleformat}, \opt{aftertitle}, \opt{runin},
+\opt{afterindent}, \opt{beforeskip}, \opt{afterskip}, \opt{fixskip},
+\opt{lotskip}, \opt{lofskip}, \opt{indent}, \opt{hang},
+\opt{pagestyle}, \opt{break}, \opt{tocline} 等。
+
+注意，对 \cls{article} 及其衍生的 \cls{ctexart} 等文档类，没有 |chapter|
+级别的标题。而对于 \cls{beamer} 文档类，这些选项控制的是由 \tn{partpage},
+\tn{sectionpage} 和 \tn{subsectionpage} 产生的标题格式，此时只有 |part|,
+|section| 和 |subsection| 这三层级别，并且 \opt{runin}, \opt{afterindent},
+\opt{fixskip}, \opt{hang}, \opt{break} 和 \opt{tocline} 这六个格式无效。
+
+多级选项之间用斜线分开，例如，\opt{part/name} 选项设置 \tn{part} 标题的在数
+字前后的名称，而 \opt{section/number} 选项设置 \tn{section} 标题的数字类型。
+注意，斜线 |/| 前后不能有空格或者换行。
+
+使用 \tn{ctexset} 设置多级选项时，可以在同一个上级选项下设置多个下级选项。
+
+例如，同时设置 |part| 一级标题的 \opt{pagestyle} 选项，|chapter| 一级标题的
+\opt{format} 与 \opt{pagestyle} 选项和 |section| 一级标题的 \opt{name} 与
+\opt{number} 选项：
+\begin{ctexexam}
+  \ctexset {
+    part/pagestyle = empty,
+    chapter = {
+      format    = \raggedright,
+      pagestyle = empty,
+    },
+    section = {
+      name   = {第,节},
+      number = \chinese{section},
+    }
+  }
+\end{ctexexam}
+
+\begin{function}[EXP,added=2015-06-21]{part/numbering, chapter/numbering,
+  section/numbering, subsection/numbering, subsubsection/numbering,
+  paragraph/numbering, subparagraph/numbering}
+  \begin{syntax}
+    numbering = \TTF
+  \end{syntax}
+  控制是否对章节标题编号。对各级标题的默认值均为 \opt{true}。
+
+  我们知道，\LaTeX{} 带星号的章节标题命令（如 \tn{section*}）不会对标题编号，
+  但也不会将该没编号的标题编入目录中。本选项控制的是不带星号的标题命令是否编号。
+  设置本选项为 \opt{false}，除了不对标题编号以外，功能与正常标题一致，
+  比如可以编目录，正确的 \pkg{hyperref} 目录超链接位置和页眉标记。
+
+  注意，章节标题的编号深度受 \LaTeX{} 计数器 |secnumdepth| 的控制。
+  \opt{numbering} 选项在 |secnumdepth| 的控制下起作用。
+\end{function}
+
+如果没有特别说明，以下将用 “|...|” 代表各级章节标题名。
+
+\begin{function}[EXP,updated=2014-03-08]{.../name}
+  \begin{syntax}
+    name = \{<前名字>,<后名字>\}
+    name = \Arg{前名字}
+  \end{syntax}
+  设置章节的名字。名字可以分为前后两部分，即章节编号前后的词语，两个词之间用
+  一个半角逗号分开；也可以只有一部分，表示只有章节编号之前的名字。例如：
+  \begin{ctexexam}
+  \ctexset{
+    chapter/name = {第,章},
+    section/name = {\S},
+  }
+  \end{ctexexam}
+  会使得 \tn{chapter} 标题使用形如“第一章”的名字，而 \tn{section} 标题则使
+  用形如“\S1”的名字。
+\end{function}
+
+\begin{table}[htbp]
+\small\centering
+\caption{\opt{name} 选项的默认设置}
+\begin{tabular}{llll}
+\toprule
+标题名 & \opt{scheme = chinese} & \opt{scheme = plain} & 注 \\
+\midrule
+part & |{第,部分}| & |{\partname\space}| & 原 \tn{partname} 为 Part \\
+chapter & |{第,章}| & |{\chaptername\space}|
+  & 原 \tn{chaptername} 为 Chapter \\
+section (beamer) & |{}| & |{\sectionname\space}|
+  & \BSTACK 原 \tn{sectionname} 为\\ |\translate{Section}| \ESTACK \\
+section & 同右 & |{}| & \\
+subsection (beamer) & |{}| & |{\subsectionname\space}|
+  & \BSTACK 原 \tn{subsectionname} 为\\ |\translate{Subsection}| \ESTACK \\
+subsection & 同右 & |{}| & \\
+subsubsection & 同右 & |{}| & \\
+paragraph & 同右 & |{}| & \\
+subparagraph & 同右 & |{}| & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{function}[EXP]{.../number}
+  \begin{syntax}
+    number = \Arg{数字输出命令}
+  \end{syntax}
+  设置章节编号的数字输出格式。\meta{数字输出命令} 通常是对应章节编号计数器的
+  输出命令，如 \tn{thesection} 或 |\chinese{chapter}| 之类。
+  \begin{ctexexam}
+  \ctexset{
+    section/number = \Roman{section}
+  }
+  \end{ctexexam}
+\end{function}
+
+  \opt{number} 选项的定义同时将控制对章节计数器的交叉引用。在引用计数器时，
+  记录在 \LaTeX{} 辅助文件中的是 \opt{number} 选项的定义。
+
+  但是，\opt{number} 选项不会影响计数器本身的输出。即设置 |section/number|
+  不会影响 \tn{thesection} 的定义。（但该选项会影响 \tn{CTEXthesection} 的定
+  义，见后。）
+
+\begin{table}[htbp]
+\small\centering
+\caption{\opt{number} 选项的默认设置}
+\setlength\leftskip{0pt plus 1 fil minus \marginparwidth}
+\begin{tabular}{llll}
+\toprule
+标题名 & \opt{scheme = chinese} & \opt{scheme = plain}
+  & 原 |\the|\meta{标题} 等价定义 \\
+\midrule
+part (beamer) & |\chinese{part}| & |\insertromanpartnumber| & 意义为 |\Roman{part}| \\
+part & |\chinese{part}| & |\thepart| & |\Roman{part}| \\
+chapter & |\chinese{chapter}| & |\thechapter| & |\arabic{chapter}| \\
+section (beamer) & 同右 & |\insertsectionnumber| & 意义为 |\arabic{section}| \\
+section & 同右 & |\thesection| & |\arabic{section}| \\
+subsection (beamer)
+  & \BSTACK |\arabic{section}.|\\ |\arabic{subsection}| \ESTACK
+  & |\insertsubsectionnumber| & 意义为 |\arabic{subsection}| \\
+subsection & 同右 & |\thesubsection| & |\thesection.\arabic{subsection}| \\
+subsubsection & 同右 & |\thesubsubsection|
+  & |\thesubsection.\arabic{subsubsection}| \\
+paragraph & 同右 & |\theparagraph|
+  & |\thesubsubsection.\arabic{paragraph}| \\
+subparagraph & 同右 & |\thesubparagraph|
+  & |\theparagraph.\arabic{subparagraph}| \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{function}{\CTEXthepart, \CTEXthechapter, \CTEXthesection,
+  \CTEXthesubsection, \CTEXthesubsubsection, \CTEXtheparagraph,
+  \CTEXthesubparagraph}
+  以 |\CTEXthe| 开头的这组宏给出结合了 \opt{name} 与 \opt{number} 选项的章节
+  编号输出格式。例如在 \opt{scheme = chinese} 时，默认章编号输出格式就是
+  \tn{CTEXthechapter}，形如“第一章”。
+
+  这组宏在 \CTeX 文档类中将代替 \tn{thechapter} 等宏的作用，在章节中引用本章
+  节的完整编号。例如用于帮助定义自定义的目录格式、页眉格式等。
+\end{function}
+
+\begin{function}[added=2016-09-18]{\CTEXifname}
+  \begin{syntax}
+    \tn{CTEXifname} \Arg{有名字时的格式命令} \Arg{无名字时的格式命令}
+  \end{syntax}
+  \tn{CTEXifname} 用于根据当前章节的名字的有无设置不同的格式。
+
+  它可用于 \opt{format}, \opt{titleformat}, \opt{aftertitle}, \opt{afterskip},
+  \opt{indent} 这五个选项和 \tn{chapter} 标题 \opt{beforeskip} 选项的格式设置之中。
+  也可用于帮助定义自定义的目录格式、页眉格式等。
+
+  例如，设置章的标题有名字时左对齐，无名字时居中对齐，并且在标题后画一条横线。
+  \begin{ctexexam}
+  \ctexset{
+    chapter/format = \CTEXifname{\raggedright}{\centering},
+    chapter/aftertitle = \par\CTEXifname{}{\hrule},
+  }
+  \end{ctexexam}
+\end{function}
+
+\begin{function}[EXP,updated=2015-06-30]{.../format, .../format+}
+  \begin{syntax}
+    format = \Arg{格式命令}
+    format+= \Arg{格式命令}
+  \end{syntax}
+  \opt{format} 选项用于控制章节标题的全局格式，作用域为章节名字和随后的标题
+  内容。可以用于控制章节标题的对齐方式、整体字体字号等格式。
+
+  带加号的 \opt{format+} 选项则用于在已有格式之后追加新的格式命令。
+
+  例如，设置章格式为无衬线字体左对齐，为节格式增加无衬线字体设置：
+  \begin{ctexexam}
+  \ctexset{
+    chapter/format  = \sffamily\raggedright,
+    section/format += \sffamily
+  }
+  \end{ctexexam}
+\end{function}
+
+\begin{table}[htbp]
+\small\centering
+\caption{\opt{format} 选项的默认设置}
+\begin{tabular}{lll}
+\toprule
+标题名 & \opt{scheme = chinese} & \opt{scheme = plain} \\
+\midrule
+part (article) & |\Large\bfseries\centering| & |\raggedright| \\
+part (beamer) & 同右 & |\centering| \\
+part & |\huge\bfseries\centering| & |\centering| \\
+chapter & |\huge\bfseries\centering| & |\raggedright| \\
+section (beamer) & 同右 & |\centering| \\
+section & |\Large\bfseries\centering| & |\Large\bfseries| \\
+subsection (beamer) & 同右 & |\centering| \\
+subsection & 同右 & |\large\bfseries| \\
+subsubsection & 同右 & |\normalsize\bfseries| \\
+paragraph & 同右 & |\normalsize\bfseries| \\
+subparagraph & 同右 & |\normalsize\bfseries| \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{function}[EXP,updated=2015-06-30]{.../nameformat, .../nameformat+}
+  \begin{syntax}
+    nameformat = \Arg{格式命令}
+    nameformat+= \Arg{格式命令}
+  \end{syntax}
+  \opt{nameformat} 用于控制章节名字的格式，作用域为章节名字，包括编号。它一
+  般用于章节名（包括编号）与章节标题的字体、字号等设置不一致的情形。参见
+  \opt{titleformat} 选项。
+
+  \opt{nameformat+} 用于在已有的章节名字格式后附加内容。
+
+  \opt{nameformat} 选项的最后一个格式命令可以是一个有一个参数的命令。
+  这个命令的参数用于接受章节名字和编号，实现特殊效果（见例~\ref{exam:miscopt}）。
+
+  \opt{nameformat} 选项的默认值，在 \opt{scheme} 选项的不同取值下相同。
+\end{function}
+
+\begin{table}[htbp]
+\small\centering
+\caption{\opt{nameformat} 选项的默认设置}
+\begin{tabular}{lll}
+\toprule
+标题名 & \opt{scheme = chinese} & \opt{scheme = plain} \\
+\midrule
+part (article) & |{}| & |\Large\bfseries| \\
+part (beamer) & 同右
+  & \BSTACK |\usebeamerfont{part name}| \\
+            |\usebeamercolor[fg]{part name}| \ESTACK \\
+part & |{}| & |\huge\bfseries| \\
+chapter & |{}| & |\huge\bfseries| \\
+section (beamer) & 同右
+  & \BSTACK |\usebeamerfont{section name}| \\
+            |\usebeamercolor[fg]{section name}| \ESTACK \\
+section & 同右 & |{}| \\
+subsection (beamer) & 同右
+  & \BSTACK |\usebeamerfont{subsection name}| \\
+            |\usebeamercolor[fg]{subsection name}| \ESTACK \\
+subsection & 同右 & |{}| \\
+subsubsection & 同右 & |{}| \\
+paragraph & 同右 & |{}| \\
+subparagraph & 同右 & |{}| \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{function}[EXP,updated=2015-06-19]{.../numberformat, .../numberformat+}
+  \begin{syntax}
+    numberformat = \Arg{格式命令}
+    numberformat+= \Arg{格式命令}
+  \end{syntax}
+  \opt{numberformat} 选项用于控制章节编号的格式，作用域仅为编号数字本身。对
+  各级标题默认均为空，当你需要编号的格式和前后的章节名字不一样时可以使用。
+
+  \opt{numberformat+} 选项用于在原有编号格式后面附加格式命令。
+
+  \opt{numberformat} 选项的最后一个格式命令可以是一个有一个参数的命令。
+  这个命令的参数用于接受编号数字。
+\end{function}
+
+  例如，我们可以使用 \opt{numberformat} 特别强调章标题中的数字：
+  \begin{ctexexam}
+  \ctexset{
+    chapter/number = \arabic{chapter},
+    chapter/numberformat = \color{blue}\zihao{0}\itshape,
+  }
+  \end{ctexexam}
+  上面的代码在 \opt{scheme = chinese} 时可以做出类似这样的章标题效果：
+  \begin{center}
+  \huge\bfseries 第 \textit{\color{blue}\zihao{0}4} 章
+  \end{center}
+
+\begin{function}[EXP,updated=2014-03-08]{.../aftername, .../aftername+}
+  \begin{syntax}
+  aftername = \Arg{代码}
+  aftername+= \Arg{代码}
+  \end{syntax}
+  \opt{aftername} 选项的参数 \meta{代码} 将被插入到章节编号与其后的标题内容之
+  间，用于控制格式变换。常用于控制章节编号与标题内容之间的距离，或者控制标题
+  是否另起一行。
+
+  \opt{aftername+} 选项用于在原有代码后面附加代码。
+\end{function}
+
+\begin{table}[htbp]
+\small\centering
+\caption{\opt{aftername} 选项的默认设置}
+\begin{tabular}{lll}
+\toprule
+标题名 & \opt{scheme = chinese} & \opt{scheme = plain} \\
+\midrule
+part (article) & |\quad| & |\par\nobreak| \\
+part (beamer) & 同右 & |\vskip 1em \par| \\
+part & 同右 & |\par\vskip 20pt| \\
+chapter & |\quad| & |\par\nobreak\vskip 20pt| \\
+section (beamer) & 同右 & |\vskip 1em \par| \\
+section & 同右 & |\quad| \\
+subsection (beamer) & 同右 & |\vskip 1em \par| \\
+subsection & 同右 & |\quad| \\
+subsubsection & 同右 & |\quad| \\
+paragraph & 同右 & |\quad| \\
+subparagraph & 同右 & |\quad| \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{function}[EXP,updated=2015-06-30]{.../titleformat, .../titleformat+}
+  \begin{syntax}
+    titleformat = \Arg{格式命令}
+    titleformat+= \Arg{格式命令}
+  \end{syntax}
+  \opt{titleformat} 选项用于控制标题内容的格式，作用域为章节标题内容。
+
+  \opt{titleformat+} 选项用于在原有标题格式后面附加格式命令。
+
+  需要注意的是，\opt{titleformat} 选项的最后一个格式命令可以是一个有一个
+  参数的命令。这个命令的参数接受标题内容，用于实现特殊效果。
+  例如，实现多行标题的居中悬挂对齐：
+\end{function}
+\begin{ctexexam}
+  \usepackage{varwidth} %% 提供 varwidth 环境
+  \ctexset{
+    chapter/name = {第,回},
+    chapter/titleformat = \chaptertitleformat
+  }
+  \newcommand\chaptertitleformat[1]{%% 以标题内容为参数
+    \begin{varwidth}[t]{.7\linewidth}#1\end{varwidth}}
+  ......
+  \chapter{情中情因情感妹妹\\错里错以错劝哥哥}
+\end{ctexexam}
+上面的代码可以做出类似这样的章标题效果：
+\begin{center}\Large\bfseries
+第三十四回\quad
+\begin{tabular}[t]{l}
+  情中情因情感妹妹\\
+  错里错以错劝哥哥
+\end{tabular}
+\end{center}
+
+\begin{table}[htbp]
+\small\centering
+\caption{\opt{titleformat} 选项的默认设置}
+\begin{tabular}{lll}
+\toprule
+标题名 & \opt{scheme = chinese} & \opt{scheme = plain} \\
+\midrule
+part (article) & |{}| & |\huge\bfseries| \\
+part (beamer) & 同右 & |\usebeamerfont{part title}| \\
+part & |{}| & |\Huge\bfseries| \\
+chapter & |{}| & |\Huge\bfseries| \\
+section (beamer) & 同右 & |\usebeamerfont{section title}| \\
+section & 同右 & |{}| \\
+subsection (beamer) & 同右 & |\usebeamerfont{subsection title}| \\
+subsection & 同右 & |{}| \\
+subsubsection & 同右 & |{}| \\
+paragraph & 同右 & |{}| \\
+subparagraph & 同右 & |{}| \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{function}[EXP,added=2015-06-19]{.../aftertitle, .../aftertitle+}
+  \begin{syntax}
+  aftertitle = \Arg{代码}
+  aftertitle+= \Arg{代码}
+  \end{syntax}
+  \opt{aftertitle} 选项的参数 \meta{代码} 将被插入到章节标题内容之后。
+
+  \opt{aftertitle+} 选项用于在原有代码后面附加代码。
+
+  \opt{aftertitle} 选项的默认值，在 \opt{scheme} 选项的不同取值下相同。
+
+  \opt{sub3section} 或 \opt{sub4section} 宏包选项（见
+  \ref{subs:options-heading}~节）会影响 \opt{aftertitle} 选项的默认值。
+\end{function}
+
+\begin{table}[htbp]
+\begin{minipage}[t]{.5\linewidth}
+\small\centering
+\caption{\opt{aftertitle} 选项的默认设置}
+\begin{tabular}{ll}
+\toprule
+标题名 & 默认值 \\
+\midrule
+part & |\par| \\
+chapter & |\par| \\
+section & |\@@par| \\
+subsection & |\@@par| \\
+subsubsection & |\@@par| \\
+paragraph & |{}| \\
+\qquad(sub3section) & |\@@par| \\
+\qquad(sub4section) & 同上 \\
+subparagraph & |{}| \\
+\qquad(sub4section) & |\@@par| \\
+\bottomrule
+\end{tabular}
+\end{minipage}%
+\begin{minipage}[t]{.5\linewidth}
+\small\centering
+\caption{\opt{runin} 选项的默认设置}
+\begin{tabular}{ll}
+\toprule
+标题名 & 默认值 \\
+\midrule
+part & 无效 \\
+chapter & 无效 \\
+section & |false| \\
+subsection & |false| \\
+subsubsection & |false| \\
+paragraph & |true| \\
+\qquad(sub3section) & |false| \\
+\qquad(sub4section) & 同上 \\
+subparagraph & |true| \\
+\qquad(sub4section) & |false| \\
+\bottomrule
+\end{tabular}
+\end{minipage}
+\end{table}
+
+\begin{function}[EXP,added=2015-06-27]{section/runin, subsection/runin,
+  subsubsection/runin, paragraph/runin, subparagraph/runin}
+  \begin{syntax}
+  runin = \TF
+  \end{syntax}
+  \opt{runin} 选项只对 \tn{section} 级以下标题有意义。
+  用于确定标题与随后的正文是否排在同一段之上。
+
+  \opt{runin} 选项的默认值，在 \opt{scheme} 选项的不同取值下相同。
+
+  默认情况下，\tn{paragraph}、\tn{subparagraph} 两级标题是与后面正文排在同一
+  段的，\opt{runin} 选项为 \opt{true}；但使用 \opt{sub3section} 或
+  \opt{sub4section} 宏包选项（见 \ref{subs:options-heading}~节）后，
+  将对这两级标题设 \opt{runin} 选项为 \opt{false}，这两级标题会改为排在不同段。
+\end{function}
+
+\begin{function}[EXP,added=2015-06-27]{.../afterindent}
+  \begin{syntax}
+  afterindent = \TF
+  \end{syntax}
+  \opt{afterindent} 选项用于设置章节标题后首段的缩进。
+
+  \cls{book} 和 \cls{report} 类的 \tn{part} 标题被单独排在一页之上，
+  \opt{afterindent} 选项没有意义。
+
+  对于 \tn{section} 级以下标题，若设置了 \opt{runin} 选项为 \opt{true}，
+  即标题与随后正文排在同一段，\opt{afterindent} 选项也就没有了意义。
+\end{function}
+
+\begin{table}[htbp]
+\small\centering
+\caption{\opt{afterindent} 选项的默认设置}
+\begin{tabular}{lll}
+\toprule
+标题名 & \opt{scheme = chinese} & \opt{scheme = plain} \\
+\midrule
+part (article) & |true| & |false| \\
+part & 无效 & 无效 \\
+chapter & |true| & |false| \\
+section & |true| & |false| \\
+subsection & |true| & |false| \\
+subsubsection & |true| & |false| \\
+paragraph & |true| & |false| \\
+subparagraph & |true| & |false| \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{function}[EXP,updated=2016-05-10]{.../beforeskip}
+  \begin{syntax}
+  beforeskip = \Arg{弹性间距}
+  \end{syntax}
+  \opt{beforeskip} 选项用于设置章节标题前的垂直间距。
+
+  \opt{beforeskip} 选项的默认值，在 \opt{scheme} 选项的不同取值下相同。
+\end{function}
+
+\begin{table}[htbp]
+\setlength\leftskip{0pt plus 1 fil minus \marginparwidth}
+\begin{minipage}[t]{.6\linewidth}
+\small\centering
+\caption{\opt{beforeskip} 选项的默认设置}
+\begin{tabular}{ll}
+\toprule
+标题名 & 默认值 \\
+\midrule
+part (article) & |4ex| \\
+part (beamer) & |0pt| \\
+part & |0pt plus 1fil| \\
+chapter & |50pt| \\
+section (beamer) & |0pt| \\
+section & |3.5ex plus 1ex minus .2ex| \\
+subsection (beamer) & |0pt| \\
+subsection & |3.25ex plus 1ex minus .2ex| \\
+subsubsection & |3.25ex plus 1ex minus .2ex| \\
+paragraph & |3.25ex plus 1ex minus .2ex| \\
+subparagraph & |3.25ex plus 1ex minus .2ex| \\
+\bottomrule
+\end{tabular}
+\end{minipage}%
+\begin{minipage}[t]{.5\linewidth}
+\small\centering
+\caption{\opt{afterskip} 选项的默认设置}
+\begin{tabular}{ll}
+\toprule
+标题名 & 默认值 \\
+\midrule
+part (article) & |3ex| \\
+part (beamer) & |0pt| \\
+part & |0pt plus 1fil| \\
+chapter & |40pt| \\
+section (beamer) & |0pt| \\
+section & |2.3ex plus .2ex| \\
+subsection (beamer) & |0pt| \\
+subsection & |1.5ex plus .2ex| \\
+subsubsection & |1.5ex plus .2ex| \\
+paragraph & |1em| \\
+\qquad(sub3section) & |1ex plus .2ex| \\
+\qquad(sub4section) & 同上 \\
+subparagraph & |1em| \\
+\qquad(sub4section) & |1ex plus .2ex| \\
+\bottomrule
+\end{tabular}
+\end{minipage}
+\end{table}
+
+\begin{function}[EXP,updated=2015-06-27]{.../afterskip}
+  \begin{syntax}
+  afterskip = \Arg{弹性间距}
+  \end{syntax}
+  \opt{afterskip} 选项控制章节标题与后面下方之间的距离。
+
+  对于 \tn{section} 级以下标题，\opt{runin} 选项会影响 \opt{afterskip} 选项的意义：
+  若 \opt{runin} 为 \opt{true}，标题与随后正文排在同一段，\meta{弹性间距} 给出水平间距。
+  否则，正文另起一段，\meta{弹性间距} 给出的是垂直间距。
+
+  \opt{afterskip} 选项的默认值，在 \opt{scheme} 选项的不同取值下相同。
+
+  \opt{sub3section} 或 \opt{sub4section} 宏包选项（见
+  \ref{subs:options-heading}~节）会影响 \opt{aftertitle} 选项的默认值。
+\end{function}
+
+\begin{function}[EXP,added=2016-06-03]{.../fixskip}
+  \begin{syntax}
+  fixskip = \TFF
+  \end{syntax}
+  默认情况下，\cls{article}、\cls{book} 和 \cls{report} 类的标题与正文的距离除了由
+  \opt{beforeskip} 和 \opt{afterskip} 选项设置的垂直间距外，还会有一些多余的间距。
+  \opt{fixskip} 选项用于抑制这些多余间距。
+\end{function}
+
+\begin{function}[EXP,added=2016-10-01]{chapter/lofskip, chapter/lotskip}
+  \begin{syntax}
+  lofskip = \Arg{弹性间距}
+  lotskip = \Arg{弹性间距}
+  \end{syntax}
+  \opt{lofskip} 选项控制插图目录（\file{.lof}）中，章之间的插图标题的距离。
+
+  同样，\opt{lotskip} 选项控制表格目录（\file{.lot}）中，章之间的表格标题的距离。
+
+  目前，这两个选项只在 \opt{chapter} 标题下有定义。
+  他们的默认值，在 \opt{scheme} 选项的不同取值下都为 \SI{10}{pt}。
+\end{function}
+
+\begin{function}[EXP,updated=2015-06-27]{.../indent}
+  \begin{syntax}
+  indent = \Arg{缩进间距}
+  \end{syntax}
+  \opt{indent} 选项用于设置章节标题本身的首行缩进。
+
+  \opt{indent} 选项的默认值，在 \opt{scheme} 选项的不同取值下相同。
+
+  如果 \opt{indent} 的值是以 \texttt{em}、\texttt{ex} 或 \cs{ccwd} 为单位，
+  那么缩进间距的大小是相对于 \opt{format} 中指定的字号大小。
+
+  例如，设置 \tn{part} 标题缩进三个字、\tn{section} 标题缩进 \SI{20}{pt}：
+\end{function}
+\begin{ctexexam}
+  \ctexset{
+    part={
+      format+=\raggedright,
+      indent=3\ccwd,
+    },
+    section={
+      format=\Large\bfseries,
+      indent=20pt,
+    }
+  }
+  \part{首行缩进的标题}
+  \noindent 无缩进的正文。
+  \section{首行缩进的标题}
+  \noindent 无缩进的正文。
+\end{ctexexam}
+
+\begin{table}[htbp]
+\begin{minipage}[t]{.5\linewidth}
+\small\centering
+\caption{\opt{indent} 选项的默认设置}
+\begin{tabular}{ll}
+\toprule
+标题名 & 默认值 \\
+\midrule
+part & |0pt| \\
+chapter & |0pt| \\
+section & |0pt| \\
+subsection & |0pt| \\
+subsubsection & |0pt| \\
+paragraph & |0pt| \\
+subparagraph & |\parindent| \\
+\qquad(sub3section) & |0pt| \\
+\qquad(sub4section) & 同上 \\
+\bottomrule
+\end{tabular}
+\end{minipage}%
+\begin{minipage}[t]{.5\linewidth}
+\small\centering
+\caption{\opt{hang} 选项的默认设置}
+\begin{tabular}{ll}
+\toprule
+标题名 & 默认值 \\
+\midrule
+part & |false| \\
+chapter & |false| \\
+section & |true| \\
+subsection & |true| \\
+subsubsection & |true| \\
+paragraph & 无意义 \\
+\qquad(sub3section) & |true| \\
+\qquad(sub4section) & |true| \\
+subparagraph & 无意义 \\
+\qquad(sub4section) & |true| \\
+\bottomrule
+\end{tabular}
+\end{minipage}%
+\end{table}
+
+\begin{function}[EXP,updated=2019-03-31]{part/hang, chapter/hang, section/hang,
+  subsection/hang, subsubsection/hang, paragraph/hang, subparagraph/hang}
+  \begin{syntax}
+  hang = \TF
+  \end{syntax}
+  \opt{hang} 选项用于设置是否对章节标题实施悬挂缩进（缩进的宽度为名字宽度和 \opt{indent} 选项
+  设置的宽度之和）。
+
+  本选项对 \cls{beamer}/\cls{ctexbeamer} 文档类无效。
+  对于 \tn{section} 级以下标题，若设置了 \opt{runin} 选项为 \opt{true}，
+  即标题与随后正文排在同一段，\opt{hang} 选项没有意义。
+\end{function}
+
+\begin{function}[EXP,added=2014-03-21]{part/pagestyle, chapter/pagestyle}
+  \begin{syntax}
+    pagestyle = \Arg{页面格式}
+  \end{syntax}
+  设置 \cls{book}/\cls{ctexbook} 或 \cls{report}/\cls{ctexrep} 文档类
+  中，\tn{part} 与 \tn{chapter} 标题所在页的页面格式（page style）。
+\end{function}
+
+\begin{table}[htbp]
+\small\centering
+\caption{\opt{pagestyle} 选项的默认设置}
+\begin{tabular}{ll}
+\toprule
+标题名 & 默认值 \\
+\midrule
+part (article) & 无效 \\
+part & |plain| \\
+chapter & |plain| \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{function}[EXP,added=2016-09-19]{.../break, .../break+}
+  \begin{syntax}
+    break = \Arg{格式命令}
+    break+= \Arg{格式命令}
+  \end{syntax}
+  \opt{break} 选项用于控制章节标题与之前正文的分隔关系。一般用于设置是否在标题之前分页或者设置行间罚点。
+
+  带加号的 \opt{break+} 选项则用于在已有格式之后追加新的格式命令。
+
+  \opt{break} 选项的默认值，在 \opt{scheme} 选项的不同取值下相同。
+
+  例如，若当前页剩余高度小于正文高度的一半时，则另起一页输出 \tn{section} 标题：
+  \begin{ctexexam}
+  \usepackage{needspace}
+  \ctexset{section/break = \Needspace{.5\textheight}}
+  \end{ctexexam}
+\end{function}
+
+\begin{table}[htbp]
+\small\centering
+\caption{\opt{break} 选项的默认设置}
+\begin{tabular}{ll}
+\toprule
+标题名 & 默认值 \\
+\midrule
+part (article) & |{}| \\
+part & |\if@openright\cleardoublepage\else\clearpage\fi| \\
+chapter & 同上 \\
+section & |\addpenalty{\@secpenalty}| \\
+subsection & 同上 \\
+subsubsection & 同上 \\
+paragraph & 同上 \\
+subparagraph & 同上 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{function}[EXP,added=2016-10-25]{.../tocline}
+  \begin{syntax}
+    tocline = \Arg{格式定义}
+  \end{syntax}
+  \opt{tocline} 选项用于定义章节标题在目录文件（\file{.toc}）中的格式。\meta{格式定义}有两个参数：
+  参数 |#1| 是 |part|、|chapter| 等名字，参数 |#2| 是标题内容。
+\end{function}
+
+\begin{table}[htbp]
+\small\centering
+\caption{\opt{tocline} 选项的默认设置}
+\begin{tabular}{ll}
+\toprule
+标题名 & 默认值 \\
+\midrule
+part & |\CTEXifname{\CTEXthepart\hspace{1em}}{}#2| \\
+chapter (\opt{chinese})
+  & |\CTEXifname{\protect\numberline{\CTEXthechapter\hspace{.3em}}}{}#2| \\
+chapter (\opt{plain})
+  & |\CTEXnumberline{#1}#2| \\
+section & |\CTEXnumberline{#1}#2| \\
+subsection & 同上 \\
+subsubsection & 同上 \\
+paragraph & 同上 \\
+subparagraph & 同上 \\
+\bottomrule
+\end{tabular}
+
+\medskip
+其中 \tn{CTEXnumberline} 的意义是若标题 |#1| 没有名字，则不输出 |\numberline{\CTEXthe#1}|
+等编号：
+\begin{verbatim}
+  \CTEXifname{\protect\numberline{\csname CTEXthe#1\endcsname}}{}
+\end{verbatim}
+\end{table}
+
+\begin{function}[EXP,added=2015-06-21]{appendix/numbering}
+  \begin{syntax}
+    numbering = \TTF
+  \end{syntax}
+  控制是否对附录章（对 \cls{book} 与 \cls{report}）或附录节（对 \cls{article}）
+  进行编号。
+
+  用法与普通章节 \opt{numbering} 选项类似。
+\end{function}
+
+\begin{function}[EXP,updated=2014-03-08]{appendix/name}
+  \begin{syntax}
+    name = \{<前名字>,<后名字>\}
+    name = \Arg{前名字}
+  \end{syntax}
+  设置附录章（对 \cls{book} 与 \cls{report}）或附录节（对 \cls{article}）的
+  名字。
+
+  用法与普通章节 \opt{name} 选项类似。
+
+  注意该选项与 \opt{appendixname} 选项（\ref{subs:capname}~节）在意义上有
+  些重叠，但意义不同。\opt{appendixname} 选项只用来重定义
+  \tn{appendixname}，而不管 \tn{appendixname} 如何使用；该选项则决定在章节标
+  题中输出的名字，可以调用 \tn{appendixname} 设置。
+\end{function}
+
+\begin{table}[htbp]
+\small\centering
+\caption{\opt{appendix/name} 选项的默认设置}
+\begin{tabular}{llllll}
+\toprule
+文档类 & 影响命令 & \opt{scheme = chinese} & 实际定义
+  & \opt{scheme = plain} & 实际定义 \\
+\midrule
+article & \tn{section} & |{}| & & |{}| & \\
+book, report & \tn{chapter} & |\appendixname\space| & \verb*|附录 |
+                            & |\appendixname\space| & \verb*|Appendix | \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{function}[EXP]{appendix/number}
+  \begin{syntax}
+    number = \Arg{数字输出命令}
+  \end{syntax}
+  设置附录章（对 \cls{book} 与 \cls{report}）或附录节（对 \cls{article}）编
+  号的数字输出格式。
+
+  用法与普通章节的 \opt{number} 选项类似。
+
+  该选项也同时控制附录章节计数器的交叉引用。
+
+  与普通章节的 \opt{number} 选项类似，同样需要注意，该选项不会影响计数器本身
+  的输出，即不影响 \tn{thesection} 或 \tn{thechapter} 的定义。
+\end{function}
+
+\begin{table}[htbp]
+\small\centering
+\caption{\opt{appendix/number} 选项的默认设置}
+\begin{tabular}{llllll}
+\toprule
+文档类 & 影响命令 & 默认值 \\
+\midrule
+article & \tn{section} & |\Alph{section}| \\
+book, report & \tn{chapter} & |\Alph{chapter}| \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+我们最后举一个稍微复杂的例子，来看看上述选项的综合应用。
+
+\begin{ctexexam}[labelref=exam:miscopt]
+  \ctexset {
+    chapter = {
+      beforeskip = 0pt,
+      fixskip    = true,
+      format     = \Huge\bfseries,
+      nameformat = \rule{\linewidth}{1bp}\par\bigskip\hfill\chapternamebox,
+      number     = \arabic{chapter},
+      aftername  = \par\medskip,
+      aftertitle = \par\bigskip\nointerlineskip\rule{\linewidth}{2bp}\par
+    }
+  }
+  \newcommand\chapternamebox[1]{%
+    \parbox{\ccwd}{\linespread{1}\selectfont\centering #1}}
+  ......
+  \chapter{熟悉 \LaTeX}
+\end{ctexexam}
+本例的设置效果大致如下：
+\begin{center}
+\begin{minipage}{.75\linewidth}\Large\bfseries
+\hrule height .5bp \relax
+\medskip
+\hfill\parbox{\ccwd}{\linespread{1}\selectfont\centering 第 1 章}
+\par\smallskip
+\noindent 熟悉 \LaTeX
+\medskip\hrule height 1bp \relax
+\end{minipage}
+\end{center}
+
+\section{实用命令}
+\label{sec:useful-commands}
+\subsection{字号与间距}
+
+\begin{function}[updated = 2014-03-08, label = ]{\zihao}
+  \begin{syntax}
+    \tn{zihao} \Arg{字号}
+  \end{syntax}
+  用于调整字号大小。其中 \meta{字号} 的有效值共有 16 个，如表 \ref{tab:zihao}
+  所示。使用 \tn{zihao} 命令调整字体大小时，西文字号大小会始终和中文字号保持一致。
+\end{function}
+
+\begin{table}[!htbp]
+\centering
+\def\ZH#1{\zihaopt{#1} & \zihao{#1}}
+\tabcolsep=1em
+\caption{中文字号}\label{tab:zihao}
+\begin{tabular}{>{\ttfamily}S[mode=text,detect-family,table-format=-1]
+                            S[table-format=2.1]S[table-format=2.5]l}
+\toprule
+{\meta{字号}} & {大小(bp)} & {大小(pt)} & 意义 \\
+\midrule
+ 0   & 42   & \ZH{0}    初号    \\
+{−0} & 36   & \ZH{-0}   小初号  \\
+ 1   & 26   & \ZH{1}    一号    \\
+-1   & 24   & \ZH{-1}   小一号  \\
+ 2   & 22   & \ZH{2}    二号    \\
+-2   & 18   & \ZH{-2}   小二号  \\
+ 3   & 16   & \ZH{3}    三号    \\
+-3   & 15   & \ZH{-3}   小三号  \\
+ 4   & 14   & \ZH{4}    四号    \\
+-4   & 12   & \ZH{-4}   小四号  \\
+ 5   & 10.5 & \ZH{5}    五号    \\
+-5   &  9   & \ZH{-5}   小五号  \\
+ 6   &  7.5 & \ZH{6}    六号    \\
+-6   &  6.5 & \ZH{-6}   小六号  \\
+ 7   &  5.5 & \ZH{7}    七号    \\
+ 8   &  5   & \ZH{8}    八号    \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{function}[updated=2014-03-28]{\ziju}
+  \begin{syntax}
+    \tn{ziju} \Arg{中文字符宽度的倍数}
+  \end{syntax}
+  用于调整相邻汉字之间的间距，即（在正常中文行文中）前一个汉字的右边缘与后一个汉字
+  的左边缘之间的距离。其中参数可以是任意浮点数值；而中文字符宽度指的是实际汉字的
+  宽度，不包含当前字距。
+
+  这个命令会影响 \tn{ccwd} 的值，但不会影响英文字距。
+\end{function}
+
+\begin{function}[updated=2014-03-27]{\ccwd}
+  当前汉字的字宽保存在长度寄存器 \tn{ccwd} 之中。汉字字宽是相邻两个汉字中心
+  之间的距离，包含字距在内。因此修改字距会间接修改字宽。
+\end{function}
+
+\subsection{中文数字转换}
+
+\CTeX{} 宏集的中文数字转换功能实际上是调用 \pkg{zhnumber} 宏包来完成。下面只
+介绍一些基本的用法，更高级的用法可以查阅 \pkg{zhnumber} 宏包的文档。
+
+\begin{function}[updated=2016-05-01]{\chinese}
+  \begin{syntax}
+    \tn{chinese} \Arg{counter}
+    \tn{pagenumbering} \{chinese\}
+  \end{syntax}
+  \tn{chinese} 命令与 \tn{roman} 等命令的用法类似，作用在一个 \LaTeX{}
+  计数器上，将计数器的值以中文数字的形式输出。
+\end{function}
+
+\begin{function}[added=2014-03-08]{\zhnumber}
+  \begin{syntax}
+    \tn{zhnumber} \Arg{number}
+  \end{syntax}
+  以中文格式输出数字。这里的数字可以是整数、小数和分数。
+\end{function}
+
+\begin{function}[added=2014-03-08]{\zhdigits}
+  \begin{syntax}
+    \tn{zhdigits} \Arg{number}
+  \end{syntax}
+  将阿拉伯数字转换为中文数字串。
+\end{function}
+
+\begin{function}{\CTEXnumber}
+  \begin{syntax}
+    \tn{CTEXnumber} "\"<macro> \Arg{number}
+  \end{syntax}
+  |\|<macro> 必须是一个 \TeX{} 宏，不需预先定义。\tn{CTEXnumber} 通过
+  \tn{zhnumber} 将 \meta{number} 转为中文数字，最后将结果存储在 |\|<macro>
+  里。对 |\|<macro> 的定义是局部的，将它展开一次就可以得到转换结果。
+\end{function}
+
+一般来说，并不需要使用 \tn{CTEXnumber}，直接使用 \tn{zhnumber} 即可。但是，如果
+在文档中需要多次使用同一个数字 \meta{number} 的中文形式，就可以先用
+\tn{CTEXnumber} 将结果保存起来备用，而不是每次使用时都用 \tn{zhnumber} 现场
+转换一次。
+
+\begin{function}{\CTEXdigits}
+  \begin{syntax}
+    \tn{CTEXdigits} "\"<macro> \Arg{number}
+  \end{syntax}
+  \tn{CTEXdigits} 与 \tn{CTEXnumber} 类似，但其转换的结果是中文数字串，而不是
+  中文数字。
+\end{function}
+
+\subsection{杂项}
+
+\begin{function}{\CTeX}
+用于显示 \CTeX 标志。
+\end{function}
+
+\section{\LuaLaTeX{} 下的中文支持方式}
+\label{sec:lualatex-chinese}
+
+在 \LuaLaTeX{} 下，\CTeX{} 宏集依赖 \pkg{LuaTeX-ja} 宏包来完成中文支持。
+该宏包是日本 \TeX{} 社区的北川弘典、前田一贵、八登崇之等人开发的，设计目的主要
+是在 \LuaTeX{} 引擎下实现日本 p\TeX{} 引擎的（大部分）功能。它为了兼容 p\LaTeX
+的使用习惯，对 \LaTeXe 的 \pkg{NFSS} 作了不少修改和扩充。这对于简体中文用户来说
+不是必要的，因而 \CTeX{} 禁用了它在 \LaTeX{} 格式下的大部分设置，只保留了必要的
+部分。同时修改了它的字体设置方式，使得相关命令与 \pkg{xeCJK} 宏包大致相同。
+
+20150420 版以后的 \pkg{LuaTeX-ja} 宏包开始支持竖排，但 \CTeX{} 暂不支持竖排。
+
+\subsection{\LuaLaTeX{} 下替代字体的设置}
+
+\begin{function}[added=2014-04-14]{AlternateFont}
+  \begin{syntax}
+    \tn{setCJKfamilyfont} \Arg{family}
+    \  [
+    \    AlternateFont =
+    \      \{
+    \        \Arg{character range_1} \oarg{alternate font features_1} \Arg{alternate font name_1} ||
+    \        \Arg{character range_2} \oarg{alternate font features_2} \Arg{alternate font name_2} ||
+    \        ......
+    \      \} ,
+    \    <base font features>
+    \  ] \Arg{base font name}
+  \end{syntax}
+  在设置字体族 \meta{family} 的时候，同时设置该字体族在字符范围
+  \meta{character range_n} 内，对应字形的替代字体。
+\end{function}
+
+\begin{function}[added=2014-04-14]{CharRange}
+  \begin{syntax}
+    \tn{setCJKfamilyfont} \Arg{family}
+    \  [
+    \    CharRange = \Arg{character range} ,
+    \    <alternate font features>
+    \  ] \Arg{alternate font name}
+  \end{syntax}
+  只设置字体族 \meta{family} 在字符范围 \meta{character range} 内，对应字形的
+  替代字体。
+\end{function}
+
+一个 \tn{setCJKfamilyfont} 里只能使用一次 \opt{CharRange} 或者
+\opt{AlternateFont}，但可以将它们分开重叠使用。例如下面的方式是有效的。
+
+\begin{ctexexam}
+  \setCJKmainfont[AlternateFont={...}{...}, ...]{...}
+  \setCJKmainfont[CharRange={"4E00->"67FF,-2}, ...]{...}
+  \setCJKmainfont[CharRange={"6800->"9FFF}, ...]{...}
+\end{ctexexam}
+
+\begin{function}[EXP,added=2014-04-14]{declarecharrange}
+  \begin{syntax}
+    \tn{ctexset}
+    \  \{
+    \    declarecharrange =
+    \      \{
+    \        \Arg{name_1} \Arg{character range_1} ,
+    \        \Arg{name_2} \Arg{character range_2} ,
+    \        ...
+    \      \}
+    \  \}
+  \end{syntax}
+  预先声明字符范围。声明字符范围 \meta{name} 之后，它的名字 \meta{name} 可以
+  用在 \opt{AlternateFont} 和 \opt{CharRange} 选项的 \meta{character range}
+  之中，表示对应的字符范围。
+\end{function}
+
+在声明字符范围 \meta{name} 的同时，还为 \tn{setCJKmainfont} 等字体设置命令定义
+了选项 \meta{name}，用于设置对应字符的替代字体：
+\begin{quote}\linespread{1}\small\ttfamily
+  \meta{name} = \oarg{alternate font features} \Arg{alternate font name}
+\end{quote}
+\meta{name} 选项可以与 \opt{AlternateFont} 共同使用，但不能与 \opt{CharRange}
+一起使用。如果没有给 \meta{name} 设置值，则等价于设置 \opt{CharRange=\meta{name}}，
+即只设置 \meta{name} 对应的字符范围的替代字体。
+
+\begin{function}[EXP,added=2014-04-15]{clearalternatefont,resetalternatefont}
+  \begin{syntax}
+    \tn{ctexset}
+    \  \{
+    \    clearalternatefont = \Arg{family_1, family_2, ...} ,
+    \    resetalternatefont = \Arg{family_1, family_2, ...} ,
+    \    clearalternatefont ,
+    \    resetalternatefont
+    \  \}
+  \end{syntax}
+  清除与重置 CJK 字体族 \meta{family} 的替换字体设置。如果没有给定值，则作用于
+  当前 CJK 字体族。清除与重置操作总是全局的。
+\end{function}
+
+\section{\CTeX{} 宏集的配置文件}
+
+\CTeX{} 宏集提供了不同的配置文件，可以通过修改配置文件来改变 \CTeX{} 宏集的
+默认行为。
+
+在多数情况下，并不需要修改配置文件，\CTeX{} 宏集的默认设置已经能满足大多数用
+户的需要。不恰当地修改 \CTeX{} 宏集的默认行为也可能导致同一文件在别处无法正
+常编译或排版效果完全不同，因此修改应该慎重。
+
+但在一些情况下，直接修改配置文件仍是必要的，例如：
+\begin{itemize}
+\item 系统没有安装默认设置的字体文件，无法编译。
+\item 需要经常编译来自其他系统的中文 \TeX{} 文件，但对方的操作系统或默认设置
+与本机不同。
+\end{itemize}
+
+与 \CTeX{} 宏集的源代码一样，配置文件采用 \LaTeXiii{} 的语法编写。
+
+\CTeX{} 宏集的配置文件随宏包其他文件一起安装在 \TeX{} 系统 TDS 目录树中，文
+件后缀是 \file{.cfg}。为了避免本地配置文件内容因 \CTeX{} 宏集的更新而丢失，
+不要直接修改系统 TDS 目录树中的配置文件，而应该将系统自带的配置文件复制到本
+地的或用户私有的 TDS 目录树中修改，并运行 \bashcmd{texhash} 命令刷新文件名数据库。
+
+例如对于 \TeX{} Live，系统自带的配置文件就在 \TeX{} Live 安装目录下的
+\path{texmf-dist/tex/latex/ctex/config/} 子目录下，可以修改它的副本，保存在
+本地 TDS 树的 \path{texmf-local/tex/latex/ctex/} 目录下，或者用户 TDS 树的
+\path{~/.texlive2015/texmf-var/tex/latex/ctex/} 目录下，作为本地/用户专有的
+配置文件。复制配置文件后需要运行 |texhash| 命令使本地配置文件生效。
+
+\MiKTeX{} 的配置文件也保存在类似的目录结构中，\MiKTeX{} 管理的
+几个 TDS 根目录可以在 \MiKTeX{} Options 设置项中查看到，这里不再赘述。
+
+除了修改本地 \TeX{} 系统中的配置文件，对于特定文档，也可以将修改过的配置文件
+保存在文档的工作目录下。此时配置文件就只对工作目录下的所有文档生效。
+
+\subsection{修改宏包默认选项}
+
+配置文件 \file{ctexopts.cfg} 可以用来修改宏包的默认选项。随系统安装的配置文
+件除了文件信息声明外没有实际的内容，但在注释中给出了一个简单的示例，只要取消
+注释就可以生效。
+
+\begin{ctexexam}
+  % 系统自带 ctexopts.cfg 注释中的示例语句，固定默认字体集为 windows。
+  % 该设置可以用在安装了 Windows 字体的非 Windows 系统中。
+  \keys_set:nn { ctex / option } { fontset = windows }
+\end{ctexexam}
+如上例所示，宏包选项通常使用 \LaTeXiii{} 的 \cs{keys_set:nn} 命令完成键值设置，
+第一个参数是固定的子模块 |ctex/option|，第二个参数中是用户定义的新的默认宏包
+选项。
+
+\file{ctexopts.cfg} 中的设置将在 \CTeX{} 宏集的开始处，定义过宏包选项之后，
+\tn{ProcessKeysOptions} 命令之前生效。最好只使用此配置文件修改宏包默认选项。
+
+\subsection{宏包载入后的配置}
+
+配置文件 \file{ctex.cfg} 将在宏包的末尾被载入生效。可以用它完成任意的设置，
+或是覆盖已有的定义。随系统安装的配置文件除版本信息外没有实际内容，注意配置文
+件中也使用 \LaTeXiii{} 语法。
+
+\begin{ctexexam}
+  % 简单的 ctex.cfg 内容示例。
+  % 修改默认的页面格式设置。
+  \pagestyle{plain}
+\end{ctexexam}
+
+\begin{ctexexam}
+  % 略复杂的 ctex.cfg 内容示例：禁止段末孤字成行。
+  % 在使用 XeTeX 编译时，打开 xeCJK 的 CheckSingle 选项。
+  \sys_if_engine_xetex:T
+    {
+      \xeCJKsetup { CheckSingle }
+    }
+  % 在使用 LuaTeX 编译时，设置 LuaTeX-ja 的 jcharwidowpenalty 参数。
+  \sys_if_engine_luatex:T
+    {
+      \ltjsetparameter { jcharwidowpenalty = 10000 }
+    }
+\end{ctexexam}
+
+\subsection{配置标题中文翻译}
+
+由于 \CTeX{} 宏集需要同时支持 GBK 和 UTF-8 两种编码，因此对标题的中文翻译写
+在两个配置文件当中：\file{ctex-name-gbk.cfg} 和 \file{ctex-name-utf8.cfg}。
+两个文件的设置相同，只是编码不同。
+
+为了同一文档在不同电脑上编译效果的一致性，通常不建议修改默认的中文翻译。
+
+\subsection{自定义字体集}
+
+\ref{subs:options-CJK-font}~节介绍的用于 |fontset| 选项的自定义字库文件，
+类似于 \CTeX{} 宏集的配置文件，也应该与其他本地配置文件一起保存在本地
+\texttt{TDS} 目录树下，并可以配合 \file{ctexopts.cfg} 等配置文件使用。
+
+\section{对旧版本的兼容性}
+
+\subsection{\CTeX\ 0.8a 及以前的版本}
+
+在 ctex-kit 项目成立之前，\CTeX 宏包的最后一个版本是 \CTeX\
+0.8a（2007/05/06）。
+
+第 2 版未考虑对这些很早版本的兼容性。
+
+\subsection{\CTeX\ 0.9--\CTeX\ 1.0d}
+
+在 2009 年在 ctex-kit 项目成立后，新增了 \XeTeX{} 引擎的支持，并增加了不少控
+制字体的命令和选项。
+
+这里主要介绍新版本 \CTeX 宏包相对 1.02d 版本（2014/06/09）的兼容性。
+
+第 2 版的 \CTeX 宏包已尽力保证对 1.0x 版本的兼容性，原有为 1.0x 编写的代码，
+在第 2 版的 \CTeX 宏包下保证仍能编译，并且在大多数情况下保持编译效果不变。
+
+\CTeX 宏包在 0.8a 以前的版本支持以 \pkg{CCT} 作为底层中文支持方式，从 0.9 版
+之后即不再推荐使用，只保留向后兼容。在 \CTeX 宏包第 2 版中则完全不再支持
+\pkg{CCT}。
+
+下面这些是在旧版本 \CTeX 宏包中存在，而在新版本中已不建议使用的选项和命令，
+在未来版本中可能会删去它们的支持。
+
+在多数情况下它们的功能仍将保留，但也有部分选项命令功能已失效。
+
+\begin{function}{cs4size, c5size}
+  分别相当于 |zihao=-4| 和 |zihao=5|，过时选项。
+\end{function}
+
+\begin{function}{CCT, CCTfont}
+相关选项已删除。
+\end{function}
+
+\begin{function}{indent, noindent}
+\opt{indent} 和 \opt{noindent} 什么也不做，过时选项。
+
+在中文版式下，\pkg{ctex} 宏包的相关功能在与标准文档类及其衍生文档类联用时
+默认打开。\CTeX{} 文档类的相关功能由章节标题的 \opt{afterindent} 选项的值
+来确定。
+\end{function}
+
+\begin{function}[label = ]{zhmap, nozhmap}
+\opt{zhmap} 宏包选项增加了参数，扩充了功能，除了支持真假值参数外，还支持选择
+\pkg{zhmCJK} 作为底层中文处理宏包。（\ref{subs:options-CJK-font}~节）
+
+\opt{nozhmap} 选项相当于 |zhmap=false|。过时选项。
+\end{function}
+
+\begin{function}{winfonts, adobefonts, nofonts}
+宏包选项 \opt{winfonts} 相当于 |fontset=windows|，\opt{adobefonts} 相当于
+|fontset=adobe|，\opt{nofonts} 相当于 |fontset=none|。这几个选项是过时选项，
+对于新文档，应使用 \opt{fontset} 选项设置不同字体集。
+
+另外，第 2 版 \CTeX 宏包的默认字体不再是 Windows 系统字体，而是根据检测到的
+操作系统选择使用 Windows、Mac 的系统字体还是 Fandol 字体
+（\ref{subs:options-CJK-font}~节）。
+\end{function}
+
+\begin{function}[label = ]{punct, nopunct}
+旧版本中宏包 \opt{punct} 选项没有参数，现在可以用参数设定标点风格
+（\ref{subs:options-type-style}~节）。原有无参形式的 \opt{punct} 选项相当
+于 |punct=quanjiao|。
+
+旧版宏包中 \opt{nopunct} 选项的效果大致相当于 |punct=plain|。过时选项，不推荐使用。
+\end{function}
+
+\begin{function}{cap, nocap}
+原有的 \opt{cap} 和 \opt{nocap} 选项由新的 \opt{scheme} 选项代替。
+（\ref{subs:options-type-style}~节）
+
+\opt{cap} 选项相当于 |scheme = chinese|，\opt{nocap} 选项相当
+于 |scheme = plain|。它们均已过时，仅因兼容性而保留。
+\end{function}
+
+\begin{function}[label = ]{space, nospace}
+新版本宏包 \opt{space} 选项增加真假值参数。
+（\ref{subs:options-type-style}~节）
+
+\opt{nospace} 选项相当于 |space=false|，成为过时选项。
+\end{function}
+
+\begin{function}{fancyhdr}
+新版本宏包中总是自动处理对 \pkg{fancyhdr} 宏包的兼容性，而由用户自己使用
+\tn{usepackage} 载入 \pkg{fancyhdr} 宏包。
+
+\opt{fancyhdr} 选项过时，因兼容性保留，功能是载入 \pkg{fancyhdr} 宏包。
+\end{function}
+
+\begin{function}{hyperref}
+新版本宏包中总是自动处理对 \pkg{hyperref} 宏包的兼容性，而由用户自己使用
+\tn{usepackage} 载入 \pkg{hyperref} 宏包。
+
+\opt{hyperref} 选项过时，因兼容性保留，功能是在导言区末尾载入 \pkg{hyperref}
+宏包。
+\end{function}
+
+\begin{function}{fntef}
+旧版本的 \opt{fntef} 选项用于统一 \pkg{CCTfntef} 与 \pkg{CJKfntef} 的界面，
+新版本 \CTeX{} 宏集不再支持 \pkg{CCT}，也不再自动载入 \pkg{CJKfntef} 或
+\pkg{xeCJKfntef} 宏包，而仅在其末尾做适当格式调整。
+
+\opt{fntef} 选项过时，因兼容性保留，功能是根据引擎载入 \pkg{CJKfntef}
+(\pdfTeX{}) 或 \pkg{xeCJKfntef} (\XeTeX{}) 宏包。
+\end{function}
+
+\begin{function}{\CTEXunderdot, \CTEXunderline, \CTEXunderdblline,
+  \CTEXunderwave, \CTEXsout, \CTEXxout, \CTEXfilltwosides}
+在调用 \opt{fntef} 宏包选项的同时，旧版本 \CTeX{} 宏包由于需要支持 \pkg{CCT}
+系统，会将以 |\CJK| 开头的 \tn{CJKunderline} 等宏换名为以 |\CTEX| 开头的
+\tn{CTEXunderline} 等宏。此功能在新版本的 \CTeX{} 宏集中已失去意义。此外，
+在 \pdfTeX{} 引擎下，用于设置格式的 \tn{CJKunderdotbasesep} 等宏也被更名为
+\tn{CTEXunderdotbasesep} 等宏。
+
+在新版本中，上述由 \opt{fntef} 衍生的相关命令和环境均被移除。
+\end{function}
+
+\begin{function}{\CTEXsetfont}
+更新当前的中文字体信息，包括当前字距（\tn{ccwd}）和段首缩进（\tn{parindent}）。
+一般来说，用户无需使用这个命令。
+\end{function}
+
+\begin{function}{\CTEXindent}
+更新 \tn{ccwd} 宽度后设置 |\parindent=2\ccwd|。过时命令。
+\end{function}
+
+\begin{function}{\CTEXnoindent}
+设置 |\parindent=0pt|。过时命令。
+\end{function}
+
+\begin{function}{\CTEXsetup}
+\begin{syntax}
+  \tn{CTEXsetup}\oarg{选项}\Arg{标题}
+\end{syntax}
+相当于设置了
+\texttt{\tn{ctexset}\{ \meta{标题} = \Arg{选项} \}}。
+过时命令。
+\end{function}
+
+\begin{function}{\CTEXoptions}
+\begin{syntax}
+  \tn{CTEXoptions}\oarg{选项}
+\end{syntax}
+相当于设置了
+\texttt{\tn{ctexset}\Arg{选项}}。
+过时命令。
+\end{function}
+
+\begin{function}{\Chinese}
+\begin{syntax}
+  \tn{Chinese}\Arg{counter}
+\end{syntax}
+新版宏集中 \tn{chinese} 统一了旧版本中 \tn{chinese} 和 \tn{Chinese} 的功能。因此，
+该命令已过时。
+\end{function}
+
+\begin{function}{captiondelimiter}
+原为 \tn{CTEXoptions} 命令的选项，用于控制 \tn{caption} 编号后面的标点。此选
+项已过时，并在新版本的 \CTeX 宏包中失效。
+
+可以使用 \pkg{caption} 宏包的 \opt{labelsep} 选项来完成同样的功能。
+\begin{ctexexam}
+  % 代替 \CTEXoptions[captiondelimiter={:}]
+  \usepackage{caption}
+  \captionsetup{labelsep=colon}
+\end{ctexexam}
+\end{function}
+
+\subsection{\CTeX\ 1.02c 以后的 SVN 开发版}
+
+\CTeX 宏包在 1.02c 版本（2011/03/11）之后在 Google code 上的 SVN 开发版本，
+内部版本号一直升到 1.11 版，但从未正式发布。SVN 开发版在 1.02c 版本的基础上
+新增的功能在第 2 版中大多继承了过来，但新增的命令与选项都不再保持兼容。
+
+\CTeX 宏包第 2 版不保证对未发布的 SVN 开发版兼容。
+
+\subsection{\CTeX\ 2.2 之前的版本}
+
+\begin{function}{part/beforeskip, chapter/beforeskip, section/beforeskip,
+  subsection/beforeskip, subsubsection/beforeskip, paragraph/beforeskip,
+  subparagraph/beforeskip}
+  在 \CTeX\ 2.2 之前的版本中，\opt{beforeskip} 选项的符号还用于确定章节标题后
+  首段的缩进。当 \opt{beforeskip} 是负值时，章节标题后的第一段按英文文档的排版
+  习惯，没有首行缩进，否则保留首行缩进。
+
+  这一特性在 2.2 版和后续版本中不再保留，相应的功能通过新的 \opt{afterindent}
+  选项来设置。如果原先设置 \opt{beforeskip} 为负值，在新版本中需要改为正值，
+  并设置相应的 \opt{afterindent} 选项为 \opt{false}。
+\end{function}
+
+\begin{function}{section/afterskip, subsection/afterskip,
+  subsubsection/afterskip, paragraph/afterskip, subparagraph/afterskip}
+  在 \CTeX\ 2.2 之前的版本中，对于 \tn{section} 级以下标题，\opt{afterskip}
+  选项的符号用于确定标题与随后正文是否排在同一段。
+  如果是正值，则正文另起一段，否则标题与随后正文排在同一段，
+  \opt{afterskip} 的绝对值给出水平间距。
+
+  这一特性在 2.2 版和后续版本中不再保留，相应的功能通过新的 \opt{runin}
+  选项来设置。如果原先设置 \opt{afterskip} 为负值，在新版本中需要改为正值，
+  并设置相应的 \opt{runin} 选项为 \opt{true}。
+\end{function}
+
+\subsection{\CTeX\ 2.4.1 和 2.4.2}
+
+\begin{function}{part/fixbeforeskip, chapter/fixbeforeskip}
+  这两个选项已经被删除，相应功能由新的选项 \opt{fixskip} 提供。
+\end{function}
+
+\section{宏集依赖情况与手工安装方法}
+\label{sec:dep-ins}
+
+本节介绍 \CTeX{} 宏集的依赖情况，并介绍手工编译安装的具体方法。
+通常用户只需参照第 \ref{subsec:easy-ins}~节介绍的方法，使用发行版自带的宏包管理器安装
+本宏集。
+
+\CTeX{} 宏集有两个源文件：\file{ctex.dtx}、\file{ctexpunct.spa}。
+使用不同的编译方式时，\CTeX{} 依赖的宏包略有不同。在手工安装 \CTeX{} 宏集之前，请确保
+你的 \TeX{} 发行版中已经正确安装了这些宏包。\CTeX{} 依赖宏包的详情叙述如下：
+
+\begin{itemize}
+  \item \pkg{expl3}、\pkg{xparse} 和 \pkg{l3keys2e} 宏包。它们属于 \pkg{l3kernel}
+  和 \pkg{l3packages} 宏集。
+  \item \pkg{indentfirst} 宏包，属于 \pkg{tools} 宏集。
+  \item \pkg{everysel} 宏包，属于 \pkg{ms} 宏集。
+  \item \pkg{ulem} 宏包。
+  \item \pkg{zhnumber} 宏包。
+  \item[\ding{229}] 以上是各种编译方式都必需的依赖项。
+  \item \pkg{CJK} 宏集。
+  \item \pkg{CJKpunct} 宏包。
+  \item \pkg{xCJK2uni} 宏包。
+  \item \pkg{zhmetrics} 宏包。
+  \item \pkg{zhmCJK} 宏包，它还依赖 \pkg{oberdiek} 宏集。
+  \item[\ding{229}] 以上是使用 \pdfLaTeX{} 或 \LaTeX{} + \dvipdfmx{} 的编译方式所需要
+  的依赖项，其中 \pkg{zhmCJK} 是可选的。
+  \item \pkg{xeCJK} 宏集，它还依赖
+  \begin{itemize}
+    \item \pkg{xtemplate} 宏包，它属于 \pkg{l3packages} 宏集。
+    \item \pkg{fontspec} 宏包。
+  \end{itemize}
+  \item \pkg{environ} 宏包，它还依赖 \pkg{trimspaces} 宏包。
+  \item[\ding{229}] 以上是使用 \XeLaTeX{} 编译时的依赖项。
+  \item \pkg{luatexja} 宏包，它还依赖
+  \begin{itemize}
+    \item \pkg{adobemapping} 宏包。
+    \item \pkg{lualibs} 宏包。
+    \item \pkg{luaotfload} 宏包。
+    \item \pkg{luatexbase} 宏包，它还依赖 \pkg{ctablestack} 宏包。
+    \item \pkg{oberdiek} 宏集。
+    \item \pkg{xkeyval} 宏包。
+    \item \pkg{etoolbox} 宏包。
+  \end{itemize}
+  \item \pkg{fontspec} 宏包。
+  \item \pkg{xunicode-addon} 宏包，属于 \pkg{xeCJK} 宏集，它还依赖
+  \begin{itemize}
+    \item \pkg{xunicode} 宏包，它还依赖
+    \begin{itemize}
+      \item \pkg{graphics} 宏集。
+      \item \pkg{graphics-cfg} 宏包。
+      \item \pkg{graphics-def} 宏包。
+    \end{itemize}
+  \end{itemize}
+  \item[\ding{229}] 以上是使用 \LuaLaTeX{} 编译时的依赖项。
+  \item \pkg{pxeverysel} 宏包，属于 \pkg{platex-tools} 宏集。
+  \item \pkg{zhmetrics-uptex} 宏包。
+  \item[\ding{229}] 以上是使用 \upLaTeX{} 编译时的依赖项。
+\end{itemize}
+
+出于一些原因，\pkg{zhmCJK} 尚未被收入 \TeXLive{} 和 \MiKTeX。因此，若
+你希望使用 \pkg{zhmCJK} 作为 \CTeX{} 宏集的底层中文支持方式，那么你需要自行安装该宏包。
+\pkg{zhmCJK} 的安装较为复杂。我们建议你
+\begin{enumerate}
+  \item 从 CTAN 下载 \pkg{zhmCJK} 宏包的
+  \href{http://mirrors.ctan.org/install/language/chinese/zhmcjk.tds.zip}
+  {TDS 安装包}，
+  \item 按目录结构将文件复制到 \TeX{} 发行版的本地 TDS 根目录，
+  \item 最后执行 \bashcmd{texhash} 刷新 \TeX{} 发行版的 ls-R 数据库以完成安装。
+\end{enumerate}
+其他细节，可参照其
+\href{http://mirrors.ctan.org/language/chinese/zhmcjk/zhmCJK.pdf}{宏包手册}
+中第 3 节的指导。
+
+\emph{\CTeX{} 宏集已被 \TeXLive{} 和 \MiKTeX{} 收录，若无特别理由，
+我们强烈建议用户使用宏包管理器安装本宏集。}
+
+若要手工安装，请遵循如下步骤：
+\begin{enumerate}
+  \item 从 CTAN 下载 \CTeX{} 宏集的
+  \href{http://mirrors.ctan.org/install/language/chinese/ctex.tds.zip}
+  {TDS 安装包}，
+  \item 按目录结构将文件复制到 \TeX{} 发行版的本地 TDS 根目录，
+  \item 最后执行 \bashcmd{texhash} 刷新 \TeX{} 发行版的 ls-R 数据库以完成安装。
+\end{enumerate}
+
+\section{开发人员}
+
+\begin{itemize}
+\item 吴凌云 (\email{aloft@ctex.org})
+\item 江疆 (\email{gzjjgod@gmail.com})
+\item 王越 (\email{yuleopen@gmail.com})
+\item 刘海洋 (\email{LeoLiu.PKU@gmail.com})
+\item 李延瑞 (\email{LiYanrui.m2@gmail.com})
+\item 陈之初 (\email{zhichu.chen@gmail.com})
+\item 李清 (\email{sobenlee@gmail.com})
+\item 黄晨成 (\email{liamhuang0205@gmail.com})
+\end{itemize}
+
+目前比较活跃的开发维护人员是刘海洋、李清和黄晨成。
+
+
+\begin{thebibliography}{9}
+\bibitem{knuthtex1986}
+\textsc{Donald~Ervin Knuth}.
+\newblock \textit{The {{\TeX{}book}}}, \textit{Computers \& Typesetting},
+  volume~A.
+\newblock Addison-Wesley, 1986
+
+\bibitem{mittelbach2004}
+\textsc{Frank Mittelbach} and \textsc{Michel Goossens}.
+\newblock \textit{The {{\LaTeX}} Companion}.
+\newblock Tools and Techniques for Computer Typesetting. Boston:
+  Addison-Wesley, second edition, 2004
+
+\end{thebibliography}
+
+\end{documentation}
+
+
+\IndexLayout
+\IndexPrologue{%
+  \section{索引}%
+}
+\PrintIndex
+
+\end{document}

@@ -1,0 +1,231 @@
+%
+% Copyright (C) 2003--2020
+% CTEX.ORG and any individual authors listed elsewhere in this file.
+% --------------------------------------------------------------------------
+%
+% This work may be distributed and/or modified under the
+% conditions of the LaTeX Project Public License, either
+% version 1.3c of this license or (at your option) any later
+% version. This version of this license is in
+%    http://www.latex-project.org/lppl/lppl-1-3c.txt
+% and the latest version of this license is in
+%    http://www.latex-project.org/lppl.txt
+% and version 1.3 or later is part of all distributions of
+% LaTeX version 2005/12/01 or later.
+%
+% This work has the LPPL maintenance status `maintained'.
+%
+% The Current Maintainers of this work are Leo Liu, Qing Lee and Liam Huang.
+%
+% --------------------------------------------------------------------------
+%
+
+\input ctxdocstrip.tex
+
+\preamble
+
+    Copyright (C) 2003--2020
+    CTEX.ORG and any individual authors listed in the documentation.
+------------------------------------------------------------------------------
+
+    This work may be distributed and/or modified under the
+    conditions of the LaTeX Project Public License, either
+    version 1.3c of this license or (at your option) any later
+    version. This version of this license is in
+       http://www.latex-project.org/lppl/lppl-1-3c.txt
+    and the latest version of this license is in
+       http://www.latex-project.org/lppl.txt
+    and version 1.3 or later is part of all distributions of
+    LaTeX version 2005/12/01 or later.
+
+    This work has the LPPL maintenance status `maintained'.
+
+    The Current Maintainers of this work are Leo Liu, Qing Lee and Liam Huang.
+
+------------------------------------------------------------------------------
+
+\endpreamble
+\postamble
+
+    This package consists of the file  ctex.dtx,
+                 and the derived files ctex.pdf,
+                                       ctex.ins,
+                                       ctex.sty,
+                                       ctexsize.sty,
+                                       ctexheading.sty,
+                                       ctexart.cls,
+                                       ctexbook.cls,
+                                       ctexrep.cls,
+                                       ctexbeamer.cls,
+                                       ctxdoc.cls,
+                                       ctexcap.sty,
+                                       ctexhook.sty,
+                                       ctexpatch.sty,
+                                       ctex-c5size.clo,
+                                       ctex-cs4size.clo,
+                                       ctex-article.def,
+                                       ctex-book.def,
+                                       ctex-report.def,
+                                       ctex-beamer.def,
+                                       ctex-scheme-plain.def,
+                                       ctex-scheme-plain-article.def,
+                                       ctex-scheme-plain-book.def,
+                                       ctex-scheme-plain-report.def,
+                                       ctex-scheme-plain-beamer.def,
+                                       ctex-scheme-chinese.def,
+                                       ctex-scheme-chinese-article.def,
+                                       ctex-scheme-chinese-book.def,
+                                       ctex-scheme-chinese-report.def,
+                                       ctex-scheme-chinese-beamer.def,
+                                       ctex-name-gbk.cfg,
+                                       ctex-name-utf8.cfg,
+                                       ctex.cfg,
+                                       ctexopts.cfg,
+                                       ctex-engine-pdftex.def,
+                                       ctex-engine-xetex.def,
+                                       ctex-engine-luatex.def,
+                                       ctex-engine-aptex.def,
+                                       ctex-engine-uptex.def,
+                                       c19rm.fd,
+                                       c19sf.fd,
+                                       c19tt.fd,
+                                       c70rm.fd,
+                                       c70sf.fd,
+                                       c70tt.fd,
+                                       jy2zhrm.fd,
+                                       jy2zhsf.fd,
+                                       jy2zhtt.fd,
+                                       jt2zhrm.fd,
+                                       jt2zhsf.fd,
+                                       jt2zhtt.fd,
+                                       ctex-fontset-adobe.def,
+                                       ctex-fontset-fandol.def,
+                                       ctex-fontset-founder.def,
+                                       ctex-fontset-mac.def,
+                                       ctex-fontset-macnew.def,
+                                       ctex-fontset-macold.def,
+                                       ctex-fontset-ubuntu.def,
+                                       ctex-fontset-windows.def,
+                                       ctexspa.def,
+                                       ctexpunct.spa,
+                                       ctexmakespa.tex,
+                                       ctexspamacro.tex,
+                                       ctxdocstrip.tex,
+                                       zhadobefonts.tex,
+                                       zhfandolfonts.tex,
+                                       zhfounderfonts.tex,
+                                       zhmacfonts.tex,
+                                       zhubuntufonts.tex,
+                                       zhwindowsfonts.tex,
+                                       translator-theorem-dictionary-ChineseGBK.dict, and
+                                       translator-theorem-dictionary-ChineseUTF8.dict.
+\endpostamble
+
+\def\CTEXDTX#1{%
+  \from{ctex-code.dtx}{#1}%
+  \from{ctex-code-internal.dtx}{#1}%
+  \from{ctex-code-option.dtx}{#1}%
+  \from{ctex-code-engine.dtx}{#1}%
+  \from{ctex-code-interface.dtx}{#1}%
+  \from{ctex-code-kerning.dtx}{#1}%
+  \from{ctex-code-number.dtx}{#1}%
+  \from{ctex-code-heading-other.dtx}{#1}%
+  \from{ctex-code-heading.dtx}{#1}%
+  \from{ctex-code-chinese.dtx}{#1}%
+  \from{ctex-code-font-size.dtx}{#1}%
+  \from{ctex-code-line-spacing.dtx}{#1}%
+  \from{ctex-code-other.dtx}{#1}%
+  \from{ctex-code-font-set.dtx}{#1}%
+  \from{ctex-code-config.dtx}{#1}%
+  \from{ctex-code-font-definition.dtx}{#1}%
+  \from{ctex-code-translator.dtx}{#1}%
+  \from{ctex-code-ctexcap.dtx}{#1}%
+  \from{ctex-code-ctexhook.dtx}{#1}%
+  \from{ctex-code-ctexpatch.dtx}{#1}%
+  \from{ctex-code-ctxdoc.dtx}{#1}%
+%   \from{ctex-code-ctxdocstrip.dtx}{#1}%
+}
+
+\generate
+  {
+    \usedir{tex/latex/ctex}
+    \file{ctex.sty}                        {\CTEXDTX{style,ctex}}
+    \file{ctexsize.sty}                    {\CTEXDTX{style,ctexsize}}
+    \file{ctexheading.sty}                 {\CTEXDTX{style,ctexheading}}
+    \file{ctexart.cls}                     {\CTEXDTX{class,article}}
+    \file{ctexbook.cls}                    {\CTEXDTX{class,book}}
+    \file{ctexrep.cls}                     {\CTEXDTX{class,report}}
+    \file{ctexbeamer.cls}                  {\CTEXDTX{class,beamer}}
+    \usepostamble\emptypostamble
+    \file{ctxdoc.cls}                      {\CTEXDTX{ctxdoc}}
+    \file{ctexcap.sty}                     {\CTEXDTX{ctexcap}}
+    \file{ctexhook.sty}                    {\CTEXDTX{ctexhook}}
+    \file{ctexpatch.sty}                   {\CTEXDTX{ctexpatch}}
+    \file{ctex-c5size.clo}                 {\CTEXDTX{c5size}}
+    \file{ctex-cs4size.clo}                {\CTEXDTX{cs4size}}
+    \file{ctex-article.def}                {\CTEXDTX{heading,article}}
+    \file{ctex-book.def}                   {\CTEXDTX{heading,book}}
+    \file{ctex-report.def}                 {\CTEXDTX{heading,report}}
+    \file{ctex-beamer.def}                 {\CTEXDTX{heading,beamer}}
+    \file{ctex-scheme-plain.def}           {\CTEXDTX{scheme,generic,plain}}
+    \file{ctex-scheme-plain-article.def}   {\CTEXDTX{scheme,article,plain}}
+    \file{ctex-scheme-plain-book.def}      {\CTEXDTX{scheme,book,plain}}
+    \file{ctex-scheme-plain-report.def}    {\CTEXDTX{scheme,report,plain}}
+    \file{ctex-scheme-plain-beamer.def}    {\CTEXDTX{scheme,beamer,plain}}
+    \file{ctex-scheme-chinese.def}         {\CTEXDTX{scheme,generic,chinese}}
+    \file{ctex-scheme-chinese-article.def} {\CTEXDTX{scheme,article,chinese}}
+    \file{ctex-scheme-chinese-book.def}    {\CTEXDTX{scheme,book,chinese}}
+    \file{ctex-scheme-chinese-report.def}  {\CTEXDTX{scheme,report,chinese}}
+    \file{ctex-scheme-chinese-beamer.def}  {\CTEXDTX{scheme,beamer,chinese}}
+    \file{ctex-name-gbk.cfg}               {\CTEXDTX{name,GBK}}
+    \file{ctex-name-utf8.cfg}              {\CTEXDTX{name,UTF8}}
+    \file{ctex.cfg}                        {\CTEXDTX{config}}
+    \file{ctexopts.cfg}                    {\CTEXDTX{ctexopts}}
+    \file{ctex-engine-pdftex.def}          {\CTEXDTX{pdftex}}
+    \file{ctex-engine-xetex.def}           {\CTEXDTX{xetex}}
+    \file{ctex-engine-luatex.def}          {\CTEXDTX{luatex}}
+    \file{ctex-engine-aptex.def}           {\CTEXDTX{aptex}}
+    \file{ctex-engine-uptex.def}           {\CTEXDTX{uptex}}
+    \file{c19rm.fd}                        {\CTEXDTX{fd,rm,c19}}
+    \file{c19sf.fd}                        {\CTEXDTX{fd,sf,c19}}
+    \file{c19tt.fd}                        {\CTEXDTX{fd,tt,c19}}
+    \file{c70rm.fd}                        {\CTEXDTX{fd,rm,c70}}
+    \file{c70sf.fd}                        {\CTEXDTX{fd,sf,c70}}
+    \file{c70tt.fd}                        {\CTEXDTX{fd,tt,c70}}
+    \file{jy2zhrm.fd}                      {\CTEXDTX{fd,rm,jy2}}
+    \file{jy2zhsf.fd}                      {\CTEXDTX{fd,sf,jy2}}
+    \file{jy2zhtt.fd}                      {\CTEXDTX{fd,tt,jy2}}
+    \file{jt2zhrm.fd}                      {\CTEXDTX{fd,rm,jt2}}
+    \file{jt2zhsf.fd}                      {\CTEXDTX{fd,sf,jt2}}
+    \file{jt2zhtt.fd}                      {\CTEXDTX{fd,tt,jt2}}
+    \file{ctex-fontset-adobe.def}          {\CTEXDTX{fontset,adobe}}
+    \file{ctex-fontset-fandol.def}         {\CTEXDTX{fontset,fandol}}
+    \file{ctex-fontset-founder.def}        {\CTEXDTX{fontset,founder}}
+    \file{ctex-fontset-mac.def}            {\CTEXDTX{fontset,mac}}
+    \file{ctex-fontset-macnew.def}         {\CTEXDTX{fontset,macnew}}
+    \file{ctex-fontset-macold.def}         {\CTEXDTX{fontset,macold}}
+    \file{ctex-fontset-ubuntu.def}         {\CTEXDTX{fontset,ubuntu}}
+    \file{ctex-fontset-windows.def}        {\CTEXDTX{fontset,windows}}
+    \file{translator-theorem-dictionary-ChineseGBK.dict}
+                                           {\CTEXDTX{dict,theorem,GBK}}
+    \file{translator-theorem-dictionary-ChineseUTF8.dict}
+                                           {\CTEXDTX{dict,theorem,UTF8}}
+    \file{ctexspa.def}
+      {
+        \CTEXDTX  {ctexspa}
+        \from{ctexpunct.spa} {}
+      }
+    \usedir{tex/generic/ctex}
+    \file{ctexmakespa.tex}                 {\CTEXDTX{spa,make}}
+    \file{ctexspamacro.tex}                {\CTEXDTX{spa,macro}}
+    \file{zhadobefonts.tex}                {\CTEXDTX{zhmap,adobe}}
+    \file{zhfandolfonts.tex}               {\CTEXDTX{zhmap,fandol}}
+    \file{zhfounderfonts.tex}              {\CTEXDTX{zhmap,founder}}
+    \file{zhmacfonts.tex}                  {\CTEXDTX{zhmap,mac}}
+    \file{zhubuntufonts.tex}               {\CTEXDTX{zhmap,ubuntu}}
+    \file{zhwindowsfonts.tex}              {\CTEXDTX{zhmap,windows}}
+    % \file{ctxdocstrip.tex}                 {\CTEXDTX{docstrip}}
+    \file{ctxdocstrip.tex}                 {\from{ctex-code-ctxdocstrip.dtx}{docstrip}}
+  }
+
+\endbatchfile

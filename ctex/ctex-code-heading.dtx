@@ -1,0 +1,1920 @@
+% \iffalse meta-comment
+%
+% Copyright (C) 2003--2020
+% CTEX.ORG and any individual authors listed elsewhere in this file.
+% --------------------------------------------------------------------------
+%
+% This work may be distributed and/or modified under the
+% conditions of the LaTeX Project Public License, either
+% version 1.3c of this license or (at your option) any later
+% version. This version of this license is in
+%    http://www.latex-project.org/lppl/lppl-1-3c.txt
+% and the latest version of this license is in
+%    http://www.latex-project.org/lppl.txt
+% and version 1.3 or later is part of all distributions of
+% LaTeX version 2005/12/01 or later.
+%
+% This work has the LPPL maintenance status `maintained'.
+%
+% The Current Maintainers of this work are Leo Liu, Qing Lee and Liam Huang.
+%
+% --------------------------------------------------------------------------
+%
+% \fi
+%
+% \section{中文化的标题结构}
+%
+% 本节内容在 \CTeX{} 文档类或打开 \opt{heading} 选项下生效。
+%    \begin{macrocode}
+%<*class|heading>
+%    \end{macrocode}
+%
+% \subsection{定义标题格式选项}
+%
+% \begin{variable}{\c_@@_section_headings_seq}
+% 保存 \tn{section} 级以下标题名字。
+%    \begin{macrocode}
+%<*article|book|report>
+\seq_const_from_clist:Nn \c_@@_section_headings_seq
+  { section , subsection , subsubsection , paragraph , subparagraph }
+%</article|book|report>
+%    \end{macrocode}
+% \end{variable}
+%
+% \begin{variable}{\c_@@_headings_seq}
+%    \begin{macrocode}
+%<*article|book|report>
+\seq_new:N \c_@@_headings_seq
+\seq_gset_eq:NN \c_@@_headings_seq \c_@@_section_headings_seq
+%<book|report>\seq_gput_left:Nn \c_@@_headings_seq { chapter }
+\seq_gput_left:Nn \c_@@_headings_seq { part }
+%</article|book|report>
+%<*beamer>
+\seq_const_from_clist:Nn \c_@@_headings_seq
+  { part , section , subsection }
+%</beamer>
+%    \end{macrocode}
+% \end{variable}
+%
+% \begin{macro}{\@@_initial_heading:n}
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \@@_initial_heading:n #1
+  {
+    \tl_new:c { CTEX@pre#1 }
+    \tl_new:c { CTEX@post#1 }
+    \tl_const:cx { CTEXthe#1 }
+      {
+        \exp_not:c { CTEX@pre#1 }
+        \exp_not:c { CTEX@the#1 }
+        \exp_not:c { CTEX@post#1 }
+      }
+    \tl_const:cx { CTEX@#1name }
+      {
+        \group_begin:
+          \exp_not:c { CTEX@#1@nameformat }
+            {
+              \exp_not:c { CTEX@pre#1 }
+              \exp_not:N \tl_if_empty:NTF
+              \exp_not:c { CTEX@#1@numberformat }
+                { \exp_not:c { CTEX@the#1 } }
+                {
+                  \group_begin:
+                    \exp_not:c { CTEX@#1@numberformat }
+                    \exp_not:c { CTEX@the#1 }
+                  \group_end:
+                }
+              \exp_not:c { CTEX@post#1 }
+            }
+        \group_end:
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\@@_def_heading_keys:n}
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \@@_def_heading_keys:n #1
+  {
+    \tl_put_right:Nx \l_@@_tmp_tl
+      {
+        #1                  .meta:nn = { ctex / #1 } { ####1 } ,
+        #1 / name            .code:n =
+          { \ctex_assign_heading_name:nn {#1} { ####1 } } ,
+        #1 / number        .tl_set:N = \exp_not:c { CTEX@the#1 } ,
+        #1 / beforeskip    .tl_set:N = \exp_not:c { CTEX@#1@beforeskip } ,
+        #1 / afterskip     .tl_set:N = \exp_not:c { CTEX@#1@afterskip} ,
+        #1 / indent        .tl_set:N = \exp_not:c { CTEX@#1@indent } ,
+        #1 / numbering   .bool_set:N = \exp_not:c { CTEX@#1@numbering } ,
+        #1 / numbering    .initial:n = true ,
+        #1 / beforeskip   .initial:n = \c_zero_skip ,
+        #1 / afterskip    .initial:n = \c_zero_skip ,
+        #1 / indent       .initial:n = \c_zero_dim ,
+        #1 / beforeskip   .value_required:n = true ,
+        #1 / afterskip    .value_required:n = true ,
+        #1 / indent       .value_required:n = true ,
+%<*article|book|report>
+        #1 / afterindent .bool_set:N = \exp_not:c { CTEX@#1@afterindent } ,
+        #1 / fixskip     .bool_set:N = \exp_not:c { CTEX@#1@fixskip } ,
+        #1 / hang        .bool_set:N = \exp_not:c { CTEX@#1@hang } ,
+        #1 / hang         .initial:n = true ,
+        #1 / runin       .bool_set:N = \exp_not:c { CTEX@#1@runin } ,
+        #1 / tocline         .code:n =
+          {
+            \cs_set:Npn \exp_not:c { CTEX@#1@tocline}
+                        \exp_not:n { ####1####2 } { ####1 }
+          } ,
+        \@@_plus_key_aux:nn {#1} { break } ,
+%</article|book|report>
+        \@@_plus_key_aux:nn {#1} { format } ,
+        \@@_plus_key_aux:nn {#1} { nameformat } ,
+        \@@_plus_key_aux:nn {#1} { numberformat } ,
+        \@@_plus_key_aux:nn {#1} { titleformat } ,
+        \@@_plus_key_aux:nn {#1} { aftername } ,
+        \@@_plus_key_aux:nn {#1} { aftertitle } ,
+      }
+  }
+\cs_new_nopar:Npn \@@_plus_key_aux:nn #1#2
+  {
+    #1 / #2   .tl_set:N = \exp_not:c { CTEX@#1@#2 } ,
+    #1 / #2 +   .code:n =
+      { \tl_put_right:Nn \exp_not:c { CTEX@#1@#2 } { ####1 } } ,
+    #1 / #2 ~ + .code:n =
+      { \tl_put_right:Nn \exp_not:c { CTEX@#1@#2 } { ####1 } }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[int]{\ctex_assign_heading_name:nn}
+% \begin{macro}{\@@_assign_heading_name:nnn}
+% \opt{name} 的值是一个至多两个元素的逗号分隔列表。由于 \LaTeXiii{} 的
+% \texttt{clist} 总是会自动忽略空元素，所以设置 |name={,章}| 后，第一个元素将会
+% 是“章”，必须用空的分组保护空元素：|name={{},章}|，这在使用中有些许不便。我们
+% 可以改用 \texttt{seq} 或者手写函数解析参数来加以改进。为实现的简单起见，这里用
+% 了 \pkg{xparse} 的 \tn{SplitArgument}，它带有参数的长度检查。
+%    \begin{macrocode}
+\NewDocumentCommand \ctex_assign_heading_name:nn
+  { m > { \SplitArgument { 1 } { , } } +m }
+  { \@@_assign_heading_name:nnn {#1} #2 }
+\cs_new_protected:Npn \@@_assign_heading_name:nnn #1#2#3
+  {
+    \tl_set:cn { CTEX@pre#1 } {#2}
+    \IfNoValueTF {#3}
+      { \tl_clear:c { CTEX@post#1 } }
+      { \tl_set:cn { CTEX@post#1 } {#3} }
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{part/pagestyle,chapter/pagestyle,chapter/lofskip,chapter/lotskip}
+% 只在 \cls{ctexbook} 和 \cls{ctexrep} 下有定义。
+%    \begin{macrocode}
+\group_begin:
+%<*book|report>
+\tl_set:Nn \l_@@_tmp_tl
+  {
+    part    / pagestyle .tl_set:N = \CTEX@part@pagestyle ,
+    chapter / pagestyle .tl_set:N = \CTEX@chapter@pagestyle ,
+    chapter / lofskip   .tl_set:N = \CTEX@chapter@lofskip ,
+    chapter / lotskip   .tl_set:N = \CTEX@chapter@lotskip ,
+    chapter / lofskip  .initial:n = \c_zero_skip ,
+    chapter / lotskip  .initial:n = \c_zero_skip ,
+    chapter / lofskip  .value_required:n = true ,
+    chapter / lotskip  .value_required:n = true ,
+  }
+%</book|report>
+%<*article|beamer>
+\tl_clear:N \l_@@_tmp_tl
+%</article|beamer>
+%    \end{macrocode}
+% \end{macro}
+%
+% 定义标题键值选项。
+%    \begin{macrocode}
+\seq_map_inline:Nn \c_@@_headings_seq
+  {
+    \@@_initial_heading:n {#1}
+    \@@_def_heading_keys:n {#1}
+  }
+\use:x
+  {
+    \group_end:
+    \keys_define:nn { ctex } { \exp_not:o { \l_@@_tmp_tl } }
+  }
+%    \end{macrocode}
+%
+%    \begin{macrocode}
+%<*article|book|report>
+%    \end{macrocode}
+%
+% \subsection{标准标题命令的修改}
+%
+% \begin{macro}[int]{\CTEX@fixtopskip}
+% 修正 \cls{book} 和 \cls{report} 类的 \tn{part} 和 \tn{chapter} 标题之前的多余空行。
+%    \begin{macrocode}
+%<*book|report>
+\cs_new_protected_nopar:Npn \CTEX@fixtopskip
+  {
+    \CTEX@fixheadingskip
+    \dim_compare:nNnF \tex_pagegoal:D < \c_max_dim
+      { \skip_sub:Nn \l_@@_heading_skip { \tex_topskip:D } }
+  }
+%</book|report>
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[int]{\CTEX@fixheadingskip}
+% 抑制行间粘连，修正标题前后的多余间距。事实上，减掉 \tn{parskip}，有一定的风险。
+% 如果接下来的内容不会进入水平模式（例如在 \opt{format} 选项中使用 \tn{hrule} 或者 \tn{hbox}），
+% \TeX{} 就不会加上 \tn{parskip}。这时候就需要用户把 \tn{parskip} 加到 \opt{beforeskip}
+% 或者 \opt{afterskip} 作为修正。
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \CTEX@fixheadingskip
+  {
+    \par
+    \dim_set:Nn \tex_prevdepth:D { -1000pt }
+    \skip_sub:Nn \l_@@_heading_skip { \tex_parskip:D }
+  }
+\skip_new:N \l_@@_heading_skip
+\cs_new_protected_nopar:Npn \CTEX@setheadingskip
+  { \skip_set:Nn \l_@@_heading_skip }
+\cs_new_eq:NN \CTEX@headingskip \l_@@_heading_skip
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[int]{\partmark}
+% 提供 \tn{partmark}。
+%    \begin{macrocode}
+\ProvideDocumentCommand \partmark { m }
+  { \markboth { } { } }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\CTEXifname}
+% \begin{macro}[int]{\CTEX@ifnametrue,\CTEX@ifnamefalse}
+% 用于判断当前标题是否有编号。
+%    \begin{macrocode}
+\cs_new_eq:NN \CTEXifname \use_ii:nn
+\cs_new_protected_nopar:Npn \CTEX@ifnametrue
+  { \cs_set_eq:NN \CTEXifname \use_i:nn }
+\cs_new_protected_nopar:Npn \CTEX@ifnamefalse
+  { \cs_set_eq:NN \CTEXifname \use_ii:nn }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}[int]{\CTEX@addloflotskip}
+% 往插图和表格目录中加入额外间距。如果间距为零，则不加入。
+%    \begin{macrocode}
+%<*book|report>
+\cs_new_protected_nopar:Npn \CTEX@addloflotskip #1
+  {
+    \skip_set:Nn \l_@@_heading_skip { \use:c { CTEX@#1@lofskip } }
+    \skip_if_eq:nnF { \l_@@_heading_skip } { \c_zero_skip }
+      {
+        \addtocontents { lof }
+          { \protect \addvspace { \skip_use:N \l_@@_heading_skip } }
+      }
+    \skip_set:Nn \l_@@_heading_skip { \use:c { CTEX@#1@lotskip } }
+    \skip_if_eq:nnF { \l_@@_heading_skip } { \c_zero_skip }
+      {
+        \addtocontents { lot }
+          { \protect \addvspace { \skip_use:N \l_@@_heading_skip } }
+      }
+  }
+%</book|report>
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[int]{\CTEX@addtocline}
+%    \begin{macrocode}
+\cs_new_protected:Npn \CTEX@addtocline #1#2
+  { \addcontentsline { toc } {#1} { \use:c { CTEX@#1@tocline } {#1} {#2} } }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[int]{\CTEX@disableautoindent}
+% 禁用自动调整首行缩进。
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \CTEX@disableautoindent
+  { \tl_clear:N \l_@@_autoindent_tl }
+%    \end{macrocode}
+% \end{macro}
+%
+% \subsubsection{part 的标题}
+%
+%    \begin{macrocode}
+%<@@=>
+%    \end{macrocode}
+%
+% \begin{macro}[int]{\part}
+%    \begin{macrocode}
+%<*article>
+\renewcommand\part{%
+   \if@noskipsec \leavevmode \fi
+   \par
+   \CTEX@part@break
+%  \addvspace{4ex}%
+   \CTEX@setheadingskip \CTEX@part@beforeskip
+   \ifodd \CTEX@part@fixskip \CTEX@fixheadingskip \fi
+   \addvspace \CTEX@headingskip
+   \ifodd \CTEX@part@afterindent
+     \@afterindenttrue
+   \else
+     \@afterindentfalse
+   \fi
+   \secdef\@part\@spart}
+%</article>
+%<*book|report>
+\renewcommand\part{%
+% \if@openright
+%   \cleardoublepage
+% \else
+%   \clearpage
+% \fi
+  \CTEX@part@break
+% \thispagestyle{plain}%
+  \thispagestyle{\CTEX@part@pagestyle}%
+  \if@twocolumn
+    \onecolumn
+    \@tempswatrue
+  \else
+    \@tempswafalse
+  \fi
+% \null\vfil
+  \CTEX@setheadingskip \CTEX@part@beforeskip
+  \ifodd \CTEX@part@fixskip \CTEX@fixtopskip \fi
+  \vspace*{\CTEX@headingskip}%
+  \secdef\@part\@spart}
+%</book|report>
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[int]{\@part}
+%    \begin{macrocode}
+%<*article>
+\def\@part[#1]#2{%
+  \ifnum \c@secnumdepth >\m@ne
+    \ifodd \CTEX@part@numbering
+      \CTEX@ifnametrue
+      \refstepcounter{part}%
+%     \addcontentsline{toc}{part}{\thepart\hspace{1em}#1}%
+    \else
+      \CTEX@ifnamefalse
+      \CTEX@makeanchor{part*}%
+%     \addcontentsline{toc}{part}{#1}%
+    \fi
+  \else
+    \CTEX@ifnamefalse
+    \CTEX@makeanchor{part*}%
+%   \addcontentsline{toc}{part}{#1}%
+  \fi
+  \CTEX@gettitle{#1}%
+  \CTEX@addtocline{part}{#1}%
+  {\interlinepenalty \@M
+%  \normalfont \parindent \z@ \raggedright
+   \CTEX@disableautoindent
+   \normalfont \CTEX@part@format
+%  \ifnum \c@secnumdepth >\m@ne
+%    \Large\bfseries\partname\nobreakspace\thepart\par\nobreak
+%  \fi
+   \CTEX@hangindent{part}%
+     {\CTEXifname{\CTEX@partname\CTEX@part@aftername}{}}%
+%  \huge\bfseries #2%
+   \CTEX@part@titleformat{#2}%
+%  \markboth{}{}%
+   \partmark{#1}%
+   \CTEX@part@aftertitle}%
+  \nobreak
+% \vskip 3ex
+  \CTEX@setheadingskip \CTEX@part@afterskip
+  \ifodd \CTEX@part@fixskip \CTEX@fixheadingskip \fi
+  \vskip \CTEX@headingskip
+  \@afterheading}
+%</article>
+%<*book|report>
+\def\@part[#1]#2{%
+  \ifnum \c@secnumdepth >-2\relax
+    \ifodd \CTEX@part@numbering
+      \CTEX@ifnametrue
+      \refstepcounter{part}%
+%     \addcontentsline{toc}{part}{\thepart\hspace{1em}#1}%
+    \else
+      \CTEX@ifnamefalse
+      \CTEX@makeanchor{part*}%
+%     \addcontentsline{toc}{part}{#1}%
+    \fi
+  \else
+    \CTEX@ifnamefalse
+    \CTEX@makeanchor{part*}%
+%   \addcontentsline{toc}{part}{#1}%
+  \fi
+  \CTEX@gettitle{#1}%
+  \CTEX@addtocline{part}{#1}%
+%  \markboth{}{}%
+   \partmark{#1}%
+  {\interlinepenalty \@M
+%  \normalfont \centering
+   \CTEX@disableautoindent
+   \normalfont \CTEX@part@format
+%  \ifnum \c@secnumdepth >-2\relax
+%    \huge\bfseries\partname\nobreakspace\thepart\par\vskip 20\p@
+%  \fi
+   \CTEX@hangindent{part}%
+     {\CTEXifname{\CTEX@partname\CTEX@part@aftername}{}}%
+%  \Huge\bfseries #2\par}%
+   \CTEX@part@titleformat{#2}%
+   \CTEX@part@aftertitle}%
+  \@endpart}
+%</book|report>
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[int]{\@spart}
+%    \begin{macrocode}
+%<*article>
+\def\@spart#1{%
+    \CTEX@ifnamefalse
+    \CTEX@makeanchor@spart{part*}%
+    \CTEX@gettitle{#1}%
+    {\interlinepenalty \@M
+%    \normalfont \parindent \z@ \raggedright
+     \CTEX@disableautoindent
+     \normalfont \CTEX@part@format
+     \CTEX@hangindent{part}{}%
+%    \huge \bfseries #1\par}%
+     \CTEX@part@titleformat{#1}%
+     \CTEX@part@aftertitle}%
+     \nobreak
+%    \vskip 3ex
+     \CTEX@setheadingskip \CTEX@part@afterskip
+     \ifodd \CTEX@part@fixskip \CTEX@fixheadingskip \fi
+     \vskip \CTEX@headingskip
+     \@afterheading}
+%</article>
+%<*book|report>
+\def\@spart#1{%
+    \CTEX@ifnamefalse
+    \CTEX@makeanchor@spart{part*}%
+    \CTEX@gettitle{#1}%
+    {\interlinepenalty \@M
+%    \normalfont \centering
+     \CTEX@disableautoindent
+     \normalfont \CTEX@part@format
+     \CTEX@hangindent{part}{}%
+%    \Huge \bfseries #1\par}%
+     \CTEX@part@titleformat{#1}%
+     \CTEX@part@aftertitle}%
+    \@endpart}
+%</book|report>
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[int]{\@endpart}
+%    \begin{macrocode}
+%<*book|report>
+\def\@endpart{%
+%             \vfil
+              \CTEX@setheadingskip \CTEX@part@afterskip
+              \ifodd \CTEX@part@fixskip \CTEX@fixheadingskip \fi
+              \vskip \CTEX@headingskip
+              \newpage
+              \if@twoside
+               \if@openright
+                \null
+                \thispagestyle{empty}%
+                \newpage
+               \fi
+              \fi
+              \if@tempswa
+                \twocolumn
+              \fi}
+%</book|report>
+%    \end{macrocode}
+% \end{macro}
+%
+% \subsubsection{chapter 的标题}
+%
+%    \begin{macrocode}
+%<*book|report>
+%    \end{macrocode}
+%
+% \begin{macro}[int]{\chapter}
+%    \begin{macrocode}
+\renewcommand\chapter{%
+%                   \if@openright\cleardoublepage\else\clearpage\fi
+%                   \thispagestyle{plain}%
+                    \CTEX@chapter@break
+                    \thispagestyle{\CTEX@chapter@pagestyle}%
+                    \global\@topnum\z@
+%                   \@afterindentfalse
+                    \ifodd \CTEX@chapter@afterindent
+                      \@afterindenttrue
+                    \else
+                      \@afterindentfalse
+                    \fi
+                    \secdef\@chapter\@schapter}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[int]{\@chapter}
+%    \begin{macrocode}
+\def\@chapter[#1]#2{%
+  \ifnum \c@secnumdepth >\m@ne
+%<*book>
+    \if@mainmatter
+%</book>
+      \ifodd \CTEX@chapter@numbering
+        \CTEX@ifnametrue
+        \refstepcounter{chapter}%
+%       \typeout{\@chapapp\space\thechapter.}%
+        \typeout{\CTEXthechapter}%
+%       \addcontentsline{toc}{chapter}
+%         {\protect\numberline{\thechapter}#1}%
+      \else
+        \CTEX@ifnamefalse
+        \CTEX@makeanchor{\Hy@chapapp*}%
+%       \addcontentsline{toc}{chapter}{#1}%
+      \fi
+%<*book>
+    \else
+      \CTEX@ifnamefalse
+      \CTEX@makeanchor@chapter{\Hy@chapapp*}%
+%     \addcontentsline{toc}{chapter}{#1}%
+    \fi
+%</book>
+  \else
+    \CTEX@ifnamefalse
+    \CTEX@makeanchor@chapter{\Hy@chapapp*}%
+%   \addcontentsline{toc}{chapter}{#1}%
+  \fi
+  \CTEX@gettitle{#1}%
+  \CTEX@addtocline{chapter}{#1}%
+  \chaptermark{#1}%
+% \addtocontents{lof}{\protect\addvspace{10\p@}}%
+% \addtocontents{lot}{\protect\addvspace{10\p@}}%
+  \CTEX@addloflotskip{chapter}%
+  \if@twocolumn
+    \@topnewpage[\@makechapterhead{#2}]%
+  \else
+    \@makechapterhead{#2}%
+  \@afterheading
+  \fi}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[int]{\@schapter}
+%    \begin{macrocode}
+\def\@schapter#1{%
+  \CTEX@ifnamefalse
+  \CTEX@makeanchor@schapter{\Hy@chapapp*}%
+  \CTEX@gettitle{#1}%
+  \if@twocolumn
+    \@topnewpage[\@makeschapterhead{#1}]%
+  \else
+    \@makeschapterhead{#1}%
+    \@afterheading
+  \fi}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[int]{\@makechapterhead}
+%    \begin{macrocode}
+\def\@makechapterhead#1{%
+% \vspace*{50\p@}%
+  \CTEX@setheadingskip \CTEX@chapter@beforeskip
+  \ifodd \CTEX@chapter@fixskip \CTEX@fixtopskip \fi
+  \vspace*{\CTEX@headingskip}%
+% {\normalfont \parindent \z@ \raggedright
+  {\CTEX@disableautoindent
+   \normalfont \CTEX@chapter@format
+   \interlinepenalty\@M
+%  \ifnum \c@secnumdepth >\m@ne
+%    \if@mainmatter
+%      \huge\bfseries\@chapapp\space\thechapter\par\nobreak\vskip 20\p@
+%    \fi
+%  \fi
+   \CTEX@hangindent{chapter}%
+     {\CTEXifname{\CTEX@chaptername\CTEX@chapter@aftername}{}}%
+%  \Huge \bfseries #1\par\nobreak
+   \CTEX@chapter@titleformat{#1}%
+   \CTEX@chapter@aftertitle
+   \nobreak
+%  \vskip 40\p@
+   \CTEX@setheadingskip \CTEX@chapter@afterskip
+   \ifodd \CTEX@chapter@fixskip \CTEX@fixheadingskip \fi
+   \vskip \CTEX@headingskip
+  }}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[int]{\@makeschapterhead}
+%    \begin{macrocode}
+\def\@makeschapterhead#1{%
+% \vspace*{50\p@}%
+  \CTEX@setheadingskip \CTEX@chapter@beforeskip
+  \ifodd \CTEX@chapter@fixskip \CTEX@fixtopskip \fi
+  \vspace*{\CTEX@headingskip}%
+% {\normalfont \parindent \z@ \raggedright
+  {\CTEX@disableautoindent
+   \normalfont \CTEX@chapter@format
+   \interlinepenalty\@M
+   \CTEX@hangindent{chapter}{}%
+%  \Huge \bfseries  #1\par\nobreak
+   \CTEX@chapter@titleformat{#1}%
+   \CTEX@chapter@aftertitle
+   \nobreak
+%  \vskip 40\p@
+   \CTEX@setheadingskip \CTEX@chapter@afterskip
+   \ifodd \CTEX@chapter@fixskip \CTEX@fixheadingskip \fi
+   \vskip \CTEX@headingskip
+  }}
+%    \end{macrocode}
+% \end{macro}
+%
+%    \begin{macrocode}
+%</book|report>
+%    \end{macrocode}
+%
+% \subsubsection{section 类的标题}
+%
+% \begin{macro}[int]{\@startsection}
+%    \begin{macrocode}
+\def\@startsection#1#2#3#4#5#6{%
+  \if@noskipsec \leavevmode \fi
+  \par
+% \@tempskipa #4\relax
+% \@afterindenttrue
+% \ifdim \@tempskipa <\z@
+%   \@tempskipa -\@tempskipa \@afterindentfalse
+% \fi
+  \CTEX@update@sectionformat@n{#1}%
+  \ifodd \CTEX@afterindent
+    \@afterindenttrue
+  \else
+    \@afterindentfalse
+  \fi
+  \if@nobreak
+    \everypar{}%
+  \else
+%   \addpenalty\@secpenalty\addvspace\@tempskipa
+    \csname CTEX@#1@break\endcsname
+    \CTEX@setheadingskip{#4}%
+    \ifodd \CTEX@fixskip \CTEX@fixheadingskip \fi
+    \addvspace \CTEX@headingskip
+  \fi
+  \@ifstar
+    {\CTEX@makeanchor@ssect{#1*}\@ssect{#3}{#4}{#5}{#6}}%
+    {\@dblarg{\@sect{#1}{#2}{#3}{#4}{#5}{#6}}}}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[int]{\@seccntformat}
+%    \begin{macrocode}
+\def\@seccntformat#1{%
+% \csname the#1\endcsname\quad}%
+  \csname CTEX@#1name\endcsname
+  \csname CTEX@#1@aftername\endcsname}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[int]{\@sect}
+%    \begin{macrocode}
+\def\@sect#1#2#3#4#5#6[#7]#8{%
+  \ifnum #2>\c@secnumdepth
+    \CTEX@ifnamefalse
+    \CTEX@makeanchor@sect{#1*}%
+    \let\@svsec\@empty
+  \else
+    \ifodd \csname CTEX@#1@numbering\endcsname
+      \CTEX@ifnametrue
+      \refstepcounter{#1}%
+      \protected@edef\@svsec{\@seccntformat{#1}\relax}%
+    \else
+      \CTEX@ifnamefalse
+      \CTEX@makeanchor{#1*}%
+      \let\@svsec\@empty
+    \fi
+  \fi
+  \CTEX@gettitle{#7}%
+% \@tempskipa #5\relax
+% \ifdim \@tempskipa>\z@
+  \unless \ifodd \CTEX@runin
+    \begingroup
+      #6{%
+        \CTEX@hangfrom{\hskip\glueexpr #3\relax\@svsec}%
+%       \interlinepenalty \@M #8\@@par}%
+        \interlinepenalty \@M
+        \csname CTEX@#1@titleformat\endcsname{#8}%
+        \csname CTEX@#1@aftertitle\endcsname}%
+    \endgroup
+    \csname #1mark\endcsname{#7}%
+%   \addcontentsline{toc}{#1}{%
+%     \ifnum #2>\c@secnumdepth \else
+%       \protect\numberline{\csname the#1\endcsname}%
+%     \fi
+%     #7}%
+    \CTEX@addtocline{#1}{#7}%
+  \else
+    \def\@svsechd{%
+    #6{\hskip\glueexpr #3\relax
+%     \@svsec #8}%
+      \@svsec
+      \csname CTEX@#1@titleformat\endcsname{#8}%
+      \csname CTEX@#1@aftertitle\endcsname}%
+    \csname #1mark\endcsname{#7}%
+%   \addcontentsline{toc}{#1}{%
+%     \ifnum #2>\c@secnumdepth \else
+%       \protect\numberline{\csname the#1\endcsname}%
+%     \fi
+%     #7}%
+    \CTEX@addtocline{#1}{#7}}%
+  \fi
+  \@xsect{#5}}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[int]{\@ssect}
+%    \begin{macrocode}
+\def\@ssect#1#2#3#4#5{%
+  \CTEX@ifnamefalse
+  \CTEX@gettitle{#5}%
+% \@tempskipa #3\relax
+% \ifdim \@tempskipa>\z@
+  \unless \ifodd \CTEX@runin
+    \begingroup
+      #4{%
+        \CTEX@hangfrom{\hskip\glueexpr #1\relax}%
+%         \interlinepenalty \@M #5\@@par}%
+          \interlinepenalty \@M
+          \CTEX@titleformat@n{#5}%
+          \CTEX@aftertitle}%
+    \endgroup
+  \else
+%   \def\@svsechd{#4{\hskip\glueexpr #1\relax #5}}%
+    \def\@svsechd{#4{\hskip\glueexpr #1\relax
+                     \CTEX@titleformat@n{#5}\CTEX@aftertitle}}%
+  \fi
+  \@xsect{#3}}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[int]{\@xsect}
+%    \begin{macrocode}
+\def\@xsect#1{%
+% \@tempskipa #1\relax
+% \ifdim \@tempskipa>\z@
+  \unless \ifodd \CTEX@runin
+    \par \nobreak
+%   \vskip \@tempskipa
+    \CTEX@setheadingskip{#1}%
+    \ifodd \CTEX@fixskip \CTEX@fixheadingskip \fi
+    \vskip \CTEX@headingskip
+    \@afterheading
+  \else
+    \@nobreakfalse
+    \global\@noskipsectrue
+    \everypar{%
+      \if@noskipsec
+        \global\@noskipsecfalse
+       {\setbox\z@\lastbox}%
+        \clubpenalty\@M
+        \begingroup \@svsechd \endgroup
+        \unskip
+%       \@tempskipa #1\relax
+%       \hskip -\@tempskipa
+        \hskip\glueexpr #1\relax
+      \else
+        \clubpenalty \@clubpenalty
+        \everypar{}%
+      \fi}%
+  \fi
+  \ignorespaces}
+%    \end{macrocode}
+% \end{macro}
+%
+%    \begin{macrocode}
+%<@@=ctex>
+%    \end{macrocode}
+%
+% \begin{macro}[int]{\CTEX@hangindent}
+% 用于实现 \tn{part} 和 \tn{chapter} 标题的 \opt{indent} 和 \opt{hang} 选项。
+%    \begin{macrocode}
+\cs_new_protected:Npn \CTEX@hangindent #1#2
+  {
+    \dim_set:Nn \parindent { \use:c { CTEX@#1@indent } }
+    \bool_if:cTF { CTEX@#1@hang }
+      { \@hangfrom { \@@_indent_aux: #2 } }
+      {#2}
+  }
+\cs_new_protected_nopar:Npn \@@_indent_aux:
+  {
+    \dim_compare:nNnF \parindent = \c_zero_dim
+      { \skip_horizontal:n { \parindent } }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[int]{\CTEX@hangfrom}
+% \opt{hang} 选项控制是否采用悬挂缩进。
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \CTEX@hangfrom
+  {
+    \bool_if:NTF \CTEX@hang
+      { \@hangfrom }
+      { \noindent \use:n }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[int]{\CTEX@update@sectionformat@n}
+% 在 \tn{@startsection} 中设置 \tn{CTEX@titleformat@n} 等为相应函数。
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \CTEX@update@sectionformat@n #1
+  {
+    \cs_set_eq:Nc \CTEX@titleformat@n { CTEX@#1@titleformat }
+    \cs_set_eq:Nc \CTEX@aftertitle    { CTEX@#1@aftertitle }
+    \cs_set_eq:Nc \CTEX@afterindent   { CTEX@#1@afterindent }
+    \cs_set_eq:Nc \CTEX@fixskip       { CTEX@#1@fixskip }
+    \cs_set_eq:Nc \CTEX@hang          { CTEX@#1@hang }
+    \cs_set_eq:Nc \CTEX@runin         { CTEX@#1@runin }
+  }
+\cs_new_eq:NN \CTEX@titleformat@n \use:n
+\cs_new_eq:NN \CTEX@aftertitle \prg_do_nothing:
+\cs_new_eq:NN \CTEX@afterindent \c_true_bool
+\cs_new_eq:NN \CTEX@fixskip \c_false_bool
+\cs_new_eq:NN \CTEX@hang \c_true_bool
+\cs_new_eq:NN \CTEX@runin \c_false_bool
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[int]{\CTEX@part@tocline, \CTEX@chapter@tocline}
+%    \begin{macrocode}
+\cs_new:Npn \CTEX@part@tocline #1#2
+  {
+    \CTEXifname
+      { \CTEXthepart \hspace { 1em } }
+      { }
+    #2
+  }
+%<*book|report>
+\cs_new:Npn \CTEX@chapter@tocline #1#2
+  {
+    \CTEXifname
+      { \protect \numberline { \CTEXthechapter \hspace { .3em } } }
+      { }
+    #2
+  }
+%</book|report>
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[int]{\CTEXnumberline}
+%    \begin{macrocode}
+\cs_new_nopar:Npn \CTEXnumberline #1
+  {
+    \CTEXifname
+      { \protect \numberline { \use:c { CTEXthe #1 } } }
+      { }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+%    \begin{macrocode}
+\int_zero:N \l_@@_tmp_int
+\seq_map_inline:Nn \c_@@_section_headings_seq
+  {
+    \int_incr:N \l_@@_tmp_int
+    \cs_gset_protected_nopar:cpx  {#1}
+      {
+        \exp_not:N \@startsection {#1}
+          { \int_use:N \l_@@_tmp_int }
+          { \exp_not:c { CTEX@#1@indent } }
+          { \exp_not:c { CTEX@#1@beforeskip } }
+          { \exp_not:c { CTEX@#1@afterskip } }
+          { \exp_not:N \normalfont \exp_not:c { CTEX@#1@format } }
+      }
+    \cs_new:cpn { CTEX@#1@tocline } ##1##2
+      { \CTEXnumberline { ##1 } ##2 }
+  }
+%    \end{macrocode}
+%
+% \subsubsection{附录标题}
+%
+% \begin{macro}[int]{appendix/name,appendix/number,appendix/numbering}
+%    \begin{macrocode}
+\keys_define:nn { ctex }
+  {
+    appendix                .meta:nn = { ctex / appendix } {#1} ,
+    appendix / name          .code:n =
+      { \ctex_assign_heading_name:nn { appendix } {#1} } ,
+    appendix / number      .tl_set:N = \CTEX@appendix@number ,
+    appendix / numbering .bool_set:N = \CTEX@appendix@numbering ,
+    appendix / numbering  .initial:n = true
+  }
+\tl_new:N \CTEX@preappendix
+\tl_new:N \CTEX@postappendix
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[int]{\appendix}
+%    \begin{macrocode}
+\cs_new_eq:NN \CTEX@save@appendix \appendix
+\cs_gset_protected_nopar:Npn \appendix
+  {
+    \CTEX@save@appendix
+%<*article>
+    \gdef \CTEX@presection { \CTEX@preappendix }
+    \gdef \CTEX@thesection { \CTEX@appendix@number }
+    \gdef \CTEX@postsection { \CTEX@postappendix }
+    \gdef \CTEX@section@numbering { \CTEX@appendix@numbering }
+%</article>
+%<*book|report>
+    \gdef \CTEX@prechapter { \CTEX@preappendix }
+    \gdef \CTEX@thechapter { \CTEX@appendix@number }
+    \gdef \CTEX@postchapter { \CTEX@postappendix }
+    \gdef \CTEX@chapter@numbering { \CTEX@appendix@numbering }
+%</book|report>
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \subsubsection{设置 \pkg{hyperref} 宏包的标题锚点}
+%
+% \begin{macro}[int]{\CTEX@makeanchor}
+% 设置超链接跳转锚点，在 \pkg{hyperref} 载入后才有意义。
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \CTEX@makeanchor #1
+  { }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{variable}{\c_@@_headings_cs_seq}
+% 保存内部标题命令的 \CTeX{} 定义，用于随后比较。
+%    \begin{macrocode}
+\seq_const_from_clist:Nn \c_@@_headings_cs_seq
+%<article>  { part , spart , sect , ssect }
+%<book|report>  { part , spart , chapter , schapter , sect , ssect }
+\seq_map_inline:Nn \c_@@_headings_cs_seq
+  {
+    \cs_new_eq:cc { CTEX@ #1 } { @ #1 }
+    \cs_new_eq:cN { CTEX@makeanchor@ #1 } \CTEX@makeanchor
+  }
+%    \end{macrocode}
+% \end{variable}
+%
+% \begin{macro}[int]{\CTEX@hyperheadinghook}
+% \pkg{hyperref} 会重定义内部标题命令，目的在于为没有编号的标题设置锚点（这一功能受他的
+% \opt{implicit} 选项的控制）。我们在上面对标题命令的修改已经包含这一功能，如果这些标题命令在
+% \pkg{hyperref} 载入之前没有被修改过，则恢复 \CTeX{} 的定义。
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \CTEX@hyperheadinghook
+  {
+    \group_begin:
+      \ifHy@implicit
+        \cs_set_eq:NN \H@old@chapter \Hy@org@chapter
+        \seq_map_inline:Nn \c_@@_headings_cs_seq
+          {
+            \cs_if_eq:ccT { H@old@ ##1 } { CTEX@ ##1 }
+              {
+                \cs_gset_eq:cc { @ ##1 } { CTEX@ ##1 }
+                \cs_gset_eq:cN { CTEX@makeanchor@ ##1 } \CTEX@makeanchor
+              }
+          }
+      \else:
+        \seq_map_inline:Nn \c_@@_headings_cs_seq
+          { \cs_gset_eq:cN { CTEX@makeanchor@ ##1 } \CTEX@makeanchor }
+      \fi:
+    \group_end:
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+%    \begin{macrocode}
+\ctex_at_end_package:nn { hyperref }
+  {
+    \cs_gset_protected_nopar:Npn \CTEX@makeanchor #1
+      {
+        \Hy@MakeCurrentHrefAuto {#1}
+        \Hy@raisedlink
+          {
+            \hyper@anchorstart { \@currentHref }
+            \hyper@anchorend
+          }
+      }
+    \CTEX@hyperheadinghook
+  }
+%    \end{macrocode}
+%
+% \subsubsection{兼容 \pkg{nameref} 宏包}
+%
+% \begin{macro}[int]{\CTEX@gettitle}
+% 在 \pkg{nameref} 载入后才有意义，与上述 \pkg{hyperref} 的处理类似。
+%    \begin{macrocode}
+\cs_new_protected:Npn \CTEX@gettitle #1
+  { }
+\ctex_at_end_package:nn { nameref }
+  {
+    \cs_gset_protected_nopar:Npn \CTEX@gettitle { \NR@gettitle }
+    \seq_map_inline:Nn \c_@@_headings_cs_seq
+      {
+        \cs_if_eq:ccT { NR@ #1 } { CTEX@ #1 }
+          { \cs_gset_eq:cc { @ #1 } { CTEX@ #1 } }
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \subsubsection{兼容 \pkg{titlesec} 宏包}
+%
+% 我们修改了 \tn{@startsection} 的定义，它的第四个（\meta{beforeskip}）和
+% 第五个（\meta{afterskip}）参数的符号不再有特殊意义，改由相应的选项
+% \opt{afterindent} 和 \opt{runin} 来控制。
+%
+% 引入 \pkg{titlesec} 宏包，并且未设置它的 \opt{loadonly} 选项时，\pkg{titlesec}
+% 会展开 section 类标题获取它们的参数，进行初始设置。我们需要进行一些调整。
+%
+% \begin{macro}[int]{\ctex_titlesec_hook:}
+% \tn{titleformat} 的设置保存在名为 |\ttlf@|\meta{section} 的宏中备用，它的内容是
+% \begin{quote}\small
+%   |\ttlh@|\meta{shape}\Arg{format}\Arg{label}\Arg{sep}\Arg{before}\Arg{after}
+% \end{quote}
+% 我们这里的 \meta{shape} 为 |hang| 或者 |runin|。\tn{titlespacing} 的设置保存在
+% |\ttls@|\meta{section} 之中，它的内容是
+% \begin{quote}\small
+%   \Arg{left}\Arg{right}\Arg{before}\Arg{after}\Arg{afterindent}
+% \end{quote}
+% 其中 \meta{afterindent} 为 |1| 或 |0|，分别对应是否保留段首缩进。
+% 我们需要根据 \CTeX{} 的 \opt{runin} 和 \opt{afterindent} 选项调整
+% |\ttlh@|\meta{shape} 和 \meta{afterindent}。注意，由 \tn{ttl@extract} 得的
+% \meta{before} 和 \meta{after} 的值总是非负的，而 \CTeX{} 的 \opt{beforeskip}
+% 和 \opt{afterskip} 是可以取负值的，但我们不打算调整它们了。
+% 如果使用了 \pkg{titlesec} 的 \opt{indentafter} 等选项，也不需要调整
+% |\ttls@|\meta{section}。
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \ctex_titlesec_hook:
+  {
+    \@ifpackagewith { titlesec } { explicit }
+      {
+        \cs_set_eq:NN \@@_titlesec_format:Nn
+                      \@@_titlesec_format_explicit:Nn
+      }
+      { }
+    \clist_map_inline:nn
+      { indentafter , noindentafter , indentfirst , nonindentfirst }
+      {
+        \@ifpackagewith { titlesec } { ##1 }
+          {
+            \clist_map_break:n
+              { \cs_set_eq:NN \@@_titlesec_hook:n \@@_titlesec_format:n }
+          }
+          { }
+      }
+    \seq_map_function:NN \c_@@_section_headings_seq \@@_titlesec_hook:n
+  }
+\cs_new_protected_nopar:Npn \@@_titlesec_hook:n #1
+  {
+    \@@_titlesec_format:n {#1}
+    \exp_args:Nc \@@_titlesec_spacing:Nn { ttls@#1 } {#1}
+  }
+\cs_new_protected_nopar:Npn \@@_titlesec_format:n #1
+  {
+    \cs_if_free:cF { ttlf@#1 }
+      { \exp_args:Nc \@@_titlesec_format:Nn { ttlf@#1 } {#1} }
+  }
+\cs_new_protected_nopar:Npn \@@_titlesec_format:Nn #1#2
+  {
+    \tl_set:Nx #1
+      {
+        \bool_if:cTF { CTEX@#2@runin }
+          { \exp_not:N \ttlh@runin }
+          { \exp_not:N \ttlh@hang }
+        \tl_tail:N #1
+      }
+  }
+\cs_new_protected_nopar:Npn \@@_titlesec_format_explicit:Nn #1#2
+  {
+    \cs_set_nopar:Npx #1 ##1
+      {
+        \bool_if:cTF { CTEX@#2@runin }
+          { \exp_not:N \ttlh@runin }
+          { \exp_not:N \ttlh@hang }
+        \exp_args:No \tl_tail:n { #1 { } }
+      }
+  }
+\cs_new_protected_nopar:Npn \@@_titlesec_spacing:Nn #1#2
+  { \tl_set:Nx #1 { \exp_after:wN \@@_titlesec_spacing:nnnnnn #1 {#2} } }
+\cs_new:Npn \@@_titlesec_spacing:nnnnnn #1#2#3#4#5#6
+  {
+    \exp_not:n { {#1} {#2} {#3} {#4} }
+    { \bool_if:cTF { CTEX@#6@afterindent } { \@ne } { \z@ } }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+%    \begin{macrocode}
+\@ifpackageloaded { titlesec }
+  { }
+  {
+    \ctex_at_end_package:nn { titlesec }
+      {
+        \@ifpackagewith { titlesec } { loadonly }
+          { }
+          { \ctex_titlesec_hook: }
+      }
+  }
+%    \end{macrocode}
+%
+% 让编译时终端显示  \tn{CTEXthechapter}，目录使用 |\CTEXtheXXX| 编号。
+%    \begin{macrocode}
+\ctex_at_end_package:nn { titlesec }
+  {
+%<*book|report>
+    \tl_set:Nn \ttl@chapterout { \typeout { \CTEXthechapter } }
+%</book|report>
+    \cs_if_free:NF \ttl@tocpart
+      {
+        \cs_set_protected_nopar:Npn \ttl@tocpart
+          { \tl_set:Nn \ttl@a { \CTEXthepart \hspace { 1em } } }
+      }
+    \seq_map_inline:Nn \c_@@_headings_seq
+      {
+        \cs_if_exist:cF { ttl@toc #1 }
+          {
+            \cs_new_protected_nopar:cpx { ttl@toc #1 }
+              {
+                \tl_set:Nn \exp_not:N \ttl@a
+                  {
+                    \exp_not:N \protect
+                    \exp_not:N \numberline { \exp_not:c { CTEXthe #1 } }
+                  }
+              }
+          }
+      }
+  }
+%    \end{macrocode}
+%
+% \subsubsection{兼容 \pkg{titleps} 宏包}
+%
+% 按照 \pkg{titleps} 宏包的实现机制，|\CTEXtheXXX| 等宏直到页眉排版时才会被展开，
+% 这可能会造成问题\footnote{\url{https://github.com/CTeX-org/ctex-kit/issues/217}}。
+%
+% \begin{macro}[int]{\ctex_titleps_hook:}
+% 我们修改 \pkg{titleps} 包的内部命令 \tn{ttl@settopmark} 和 \tn{ttl@setsubmark}，
+% 将 |\CTEXtheXXX| 等加入更新队列中。
+%    \begin{macrocode}
+\group_begin:
+\char_set_catcode_other:N \#
+\cs_new_protected_nopar:Npn \ctex_titleps_hook:
+  {
+    \ctex_patch_cmd:Nnn \ttl@settopmark
+      { \protect \@namedef { the#1 } { \@nameuse { the#1 } } }
+      {
+        \protect \@namedef { the#1 } { \@nameuse { the#1 } }
+        \CTEX@titlepslabel@set {#1}
+      }
+    \ctex_patch_cmd:Nnn \ttl@setsubmark
+      { \protect \@namedef { the#1 } { } }
+      {
+        \protect \@namedef { the#1 } { }
+        \CTEX@titlepslabel@clear {#1}
+      }
+    \ctex_patch_cmd:Nnn \ttl@setsubmark
+      { \protect \@namedef { the#2 } { \@nameuse { the#2 } } }
+      {
+        \protect \@namedef { the#2 } { \@nameuse { the#2 } }
+        \CTEX@titlepslabel@set {#2}
+      }
+  }
+\group_end:
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[int]{\CTEX@titlepslabel@set,\CTEX@titlepslabel@clear}
+% 这两个函数要在随后被 \tn{xdef} 展开来获得 |\CTEXtheXXX| 的内容，不应该用
+% \tn{protected} 来定义。
+%    \begin{macrocode}
+\cs_new_nopar:Npn \CTEX@titlepslabel@set #1
+  {
+    \cs_if_free:cF { CTEXthe#1 }
+      { \protect \@namedef { CTEXthe#1 } { \@nameuse { CTEXthe#1 } } }
+  }
+\cs_new_nopar:Npn \CTEX@titlepslabel@clear #1
+  {
+    \cs_if_free:cF { CTEXthe#1 }
+      { \protect \@namedef { CTEXthe#1 } { } }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \pkg{titleps} 宏包的功能可以由 \pkg{titlesec} 的选项 \opt{pagestyles} 引入。
+%    \begin{macrocode}
+\ctex_at_end_package:nn { titlesec }
+  { \cs_if_free:NF \ttl@settopmark { \ctex_titleps_hook: } }
+\ctex_at_end_package:nn { titleps } { \ctex_titleps_hook: }
+%    \end{macrocode}
+%
+% 除此之外，也可以使用 \pkg{titleps} 提供的命令 \tn{newtitlemark} 来完成：
+% \begin{verbatim}
+%   \newtitlemark { \CTEXthechapter }
+%   \newtitlemark { \CTEXthesection }
+% \end{verbatim}
+% 但 \tn{newtitlemark} 不包含章节间的层次信息，功能上不及修改内部命令完整。
+%
+% \begin{macro}[int]{\ttl@setifthe}
+% 使 |\iftheXXX| 等命令在页眉设置中可用。
+%    \begin{macrocode}
+\ctex_at_end_package:nn { titleps }
+  {
+    \cs_set_protected_nopar:Npn \ttl@setifthe #1
+      {
+        \exp_args:Nco \cs_set_nopar:Npn { ifthe #1 }
+          {
+            \CTEXifname
+              { \protect \@firstoftwo }
+              { \protect \@secondoftwo }
+          }
+      }
+    \seq_map_function:NN \c_@@_headings_seq \ttl@setifthe
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \subsection{目录标签的宽度}
+%
+% \begin{macro}{\CTEX@toc@width@n}
+%   \begin{macrocode}
+\cs_new_protected:Npn \CTEX@toc@width@n #1
+  {
+    \hbox_set:Nn \l_@@_tmp_box {#1}
+    \dim_set:Nn \@tempdima
+      {
+        \dim_max:nn { \@tempdima }
+          { \box_wd:N \l_@@_tmp_box + \f@size \p@ / 2 }
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\numberline,\@@_patch_toc_width:n}
+% 为 \tn{numberline} 命令打补丁，并兼容 \pkg{tocloft} 和 \pkg{titletoc} 宏包。
+%
+% 这里需要替换 |#| 本身，因此需要先切换为 other 类。表示参数的 |#| 用
+% \cs{c_parameter_token} 代替。
+%   \begin{macrocode}
+\group_begin:
+\char_set_catcode_other:N \#
+\use:n
+  {
+    \group_end:
+    \ctex_preto_cmd:NnnTF \numberline { \ExplSyntaxOff }
+      { \CTEX@toc@width@n {#1} }
+      { }
+      { \ctex_patch_failure:N \numberline }
+    \cs_new_protected:Npn \@@_patch_toc_width:n \c_parameter_token 1
+      {
+        \@ifpackageloaded { \c_parameter_token 1 }
+          { }
+          {
+            \ctex_at_end_package:nn { \c_parameter_token 1 }
+              {
+                \ctex_preto_cmd:NnnTF \numberline
+                  { \char_set_catcode_letter:n { 64 } }
+                  { \CTEX@toc@width@n {#1} }
+                  { }
+                  { \ctex_patch_failure:N \numberline }
+              }
+          }
+      }
+  }
+\@@_patch_toc_width:n { tocloft  }
+\@@_patch_toc_width:n { titletoc }
+%    \end{macrocode}
+% \end{macro}
+%
+% \subsection{页眉信息的修改}
+%
+% \begin{macro}[int]{\ps@headings}
+%    \begin{macrocode}
+%<*article>
+\if@twoside
+  \ctex_patch_cmd:Nnn \ps@headings
+    { \ifnum \c@secnumdepth > \z@ \thesection \quad \fi }
+    { \CTEXifname { \CTEXthesection \quad } { } }
+  \ctex_patch_cmd:Nnn \ps@headings
+    { \ifnum \c@secnumdepth > \@ne \thesubsection \quad \fi }
+    { \CTEXifname { \CTEXthesubsection \quad } { } }
+\else:
+%    \end{macrocode}
+% 不知为何，标准文档类此处对 \texttt{secnumdepth} 的判断为 $0$，与 \tn{section} 的层次 $1$ 不符。
+%    \begin{macrocode}
+  \ctex_patch_cmd:Nnn \ps@headings
+    { \ifnum \c@secnumdepth > \m@ne \thesection \quad \fi }
+    { \CTEXifname { \CTEXthesection \quad } { } }
+\fi:
+%</article>
+%<*book|report>
+\ctex_patch_cmd:Nnn \ps@headings
+  {
+%<book>    \ifnum \c@secnumdepth > \m@ne \if@mainmatter
+%<report>    \ifnum \c@secnumdepth > \m@ne
+      \@chapapp \ \thechapter . ~ \ %
+%<report>    \fi
+%<book>    \fi \fi
+  }
+  { \CTEXifname { \CTEXthechapter \quad } { } }
+\if@twoside
+  \ctex_patch_cmd:Nnn \ps@headings
+    { \ifnum \c@secnumdepth > \z@ \thesection . ~ \ \fi }
+    { \CTEXifname { \CTEXthesection \quad } { } }
+\fi:
+%</book|report>
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \begin{macro}[int]{\ps@fancy}
+% 这里对 \pkg{fancyhdr} 宏包打补丁。原来 \pkg{fancyhdr} 宏包中使用
+% \tn{thesection} 等宏表示页眉中的章节编号，这里改用 \pkg{ctex} 包所用的
+% \tn{CTEXthesection} 系列宏。
+%    \begin{macrocode}
+\ctex_at_end_package:nn { fancyhdr }
+  {
+%<*article>
+    \ctex_patch_cmd:Nnn \ps@fancy
+      { \ifnum \c@secnumdepth > \z@ \thesection \hskip 1em \relax \fi }
+      { \CTEXifname { \CTEXthesection \quad } { } }
+    \ctex_patch_cmd:Nnn \ps@fancy
+      { \ifnum \c@secnumdepth > \@ne \thesubsection \hskip 1em \relax \fi }
+      { \CTEXifname { \CTEXthesubsection \quad } { } }
+%</article>
+%<*book|report>
+    \ctex_patch_cmd:Nnn \ps@fancy
+      { \ifnum \c@secnumdepth > \m@ne \@chapapp \ \thechapter . ~ \ \fi }
+      { \CTEXifname { \CTEXthechapter \quad } { } }
+    \ctex_patch_cmd:Nnn \ps@fancy
+      { \ifnum \c@secnumdepth > \z@ \thesection . ~ \ \fi }
+      { \CTEXifname { \CTEXthesection \quad } { } }
+%</book|report>
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+%    \begin{macrocode}
+%</article|book|report>
+%    \end{macrocode}
+%
+% \subsection{\cls{beamer} 标题页模板的修改}
+%
+%    \begin{macrocode}
+%<*beamer>
+%    \end{macrocode}
+%
+%    \begin{macrocode}
+\ExplSyntaxOff
+%    \end{macrocode}
+%
+% 对应 \tn{partpage}。
+%    \begin{macrocode}
+\defbeamertemplate*{part page}{CTEX}[1][]{%
+  \begingroup
+    \CTEX@disableautoindent
+%    \centering
+%    {\usebeamerfont{part name}%
+%     \usebeamercolor[fg]{part name}\partname~\insertromanpartnumber}
+%    \vskip1em\par
+    \par \addvspace{\glueexpr\CTEX@part@beforeskip\relax}%
+    \CTEX@part@format
+    \parindent \dimexpr \CTEX@part@indent \relax
+    \ifodd \CTEX@part@numbering
+      \CTEX@partname \CTEX@part@aftername
+    \fi
+    \begin{beamercolorbox}[sep=16pt,center,#1]{part title}
+%      \usebeamerfont{part title}\insertpart\par
+      \CTEX@part@titleformat \insertpart \CTEX@part@aftertitle
+    \end{beamercolorbox}%
+    \par \addvspace{\glueexpr\CTEX@part@afterskip\relax}%
+  \endgroup
+}
+%    \end{macrocode}
+%
+% 对应 \tn{sectionpage}。
+%    \begin{macrocode}
+\defbeamertemplate*{section page}{CTEX}[1][]{%
+  \begingroup
+    \CTEX@disableautoindent
+%    \centering
+%    {\usebeamerfont{section name}%
+%     \usebeamercolor[fg]{section name}\sectionname~\insertsectionnumber}
+%    \vskip1em\par
+    \par \addvspace{\glueexpr\CTEX@section@beforeskip\relax}%
+    \CTEX@section@format
+    \parindent \dimexpr \CTEX@section@indent \relax
+    \ifodd \CTEX@section@numbering
+      \CTEX@sectionname \CTEX@section@aftername
+    \fi
+    \begin{beamercolorbox}[sep=12pt,center,#1]{part title}
+%      \usebeamerfont{section title}\insertsection\par
+      \CTEX@section@titleformat \insertsection \CTEX@section@aftertitle
+    \end{beamercolorbox}%
+    \par \addvspace{\glueexpr\CTEX@section@afterskip\relax}%
+  \endgroup
+}
+%    \end{macrocode}
+%
+% 对应 \tn{subsectionpage}。
+%    \begin{macrocode}
+\defbeamertemplate*{subsection page}{CTEX}[1][]{%
+  \begingroup
+    \CTEX@disableautoindent
+%    \centering
+%    {\usebeamerfont{subsection name}%
+%     \usebeamercolor[fg]{subsection name}\subsectionname~\insertsubsectionnumber}
+%    \vskip1em\par
+    \par \addvspace{\glueexpr\CTEX@subsection@beforeskip\relax}%
+    \CTEX@subsection@format
+    \parindent \dimexpr \CTEX@subsection@indent \relax
+    \ifodd \CTEX@subsection@numbering
+      \CTEX@subsectionname \CTEX@subsection@aftername
+    \fi
+    \begin{beamercolorbox}[sep=8pt,center,#1]{part title}
+%      \usebeamerfont{subsection title}\insertsubsection\par
+      \CTEX@subsection@titleformat \insertsubsection \CTEX@subsection@aftertitle
+    \end{beamercolorbox}%
+    \par \addvspace{\glueexpr\CTEX@subsection@afterskip\relax}%
+  \endgroup
+}
+%    \end{macrocode}
+%
+% 将 \cls{beamer} 的默认模板重定向为 \texttt{CTEX} 模板。
+%    \begin{macrocode}
+\defbeamertemplatealias{part page}{default}{CTEX}
+\defbeamertemplatealias{section page}{default}{CTEX}
+\defbeamertemplatealias{subsection page}{default}{CTEX}
+%    \end{macrocode}
+%
+%    \begin{macrocode}
+\ExplSyntaxOn
+%    \end{macrocode}
+%
+%    \begin{macrocode}
+%</beamer>
+%    \end{macrocode}
+%
+% \subsection{标签引用数字的汉化}
+%
+% \begin{macro}[int]{\refstepcounter}
+% 对标题进行引用时，设置标签为通过 \opt{number} 选项设置的形式。
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \CTEX@setcurrentlabel@n #1
+  {
+    \protected@edef \@currentlabel
+      {
+        \cs_if_exist:cTF { CTEX@the#1 }
+          { \exp_args:cc { p@#1 } { CTEX@the#1 } }
+          { \exp_not:o { \@currentlabel } }
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[int]{\ctex_varioref_hook:}
+% 关于标签引用的宏包可能会修改 \tn{refstepcounter}。其中 \pkg{cleveref} 和
+% \pkg{hyperref} 宏包都会保存之前的定义，并且它们都要求尽可能晚的被载入，所以
+% 对我们上述的修改影响不大。需要注意的是 \pkg{varioref} 宏包，如果它在
+% \CTeX{} 之后被载入，我们之前的修改将会被覆盖。
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \ctex_varioref_hook:
+  {
+    \seq_map_inline:Nn \c_@@_headings_seq
+      { \ctex_fix_varioref_label:n { ##1 } }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\@@_fix_varioref_label:n}
+% \pkg{varioref} 宏包的 \tn{labelformat} 实际上是定义一个以 |\the<#1>| 为参数的宏
+% |\p@<#1>|。\LaTeX{} 在定义计数器 |<#1>| 时，都会将 |\p@<#1>| 初始化为 \tn{@empty}。
+% 如果这个宏非空，说明用户自定义了标签格式，我们就不再修改。这里不能使用
+% \cs{exp_args:Nnc}，因为 \texttt{c} 这种展开格式不会将参数放在花括号内。而
+% \tn{labelformat} 的定义是
+% \begin{verbatim}
+%   \def\labelformat#1{\expandafter\def\csname p@#1\endcsname##1}
+% \end{verbatim}
+% 它的第二个参数必须放在花括号内，否则将会被作为宏的定界符号。
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \ctex_fix_varioref_label:n #1
+  {
+    \tl_if_empty:cT { p@#1 }
+      { \exp_args:Nno \labelformat {#1} { \cs:w CTEX@the#1 \cs_end: } }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% 如果 \pkg{varioref} 已经被载入，则使用它来设置。
+%    \begin{macrocode}
+\@ifpackageloaded { varioref }
+  { \ctex_varioref_hook: }
+  {
+    \cs_new_eq:NN \CTEX@save@refstepcounter \refstepcounter
+    \RenewDocumentCommand \refstepcounter { m }
+      {
+        \CTEX@save@refstepcounter {#1}
+        \CTEX@setcurrentlabel@n {#1}
+      }
+    \ctex_at_end_package:nn { varioref } { \ctex_varioref_hook: }
+  }
+%    \end{macrocode}
+%
+% \subsection{载入 \meta{scheme} 文件}
+%
+%    \begin{macrocode}
+\ctex_scheme_input:o { \l_@@_scheme_tl }
+%    \end{macrocode}
+%
+%    \begin{macrocode}
+%</class|heading>
+%    \end{macrocode}
+%
+% \subsection{标题格式的 \opt{scheme} 定义}
+%
+% 下面使用 \CTeX 文档类的设置方式，\opt{plain} 模拟标准文档类直接定义或以
+% \tn{@startsection} 设定的章节标题格式，\opt{chinese} 汉化的标题格式。
+%
+%    \begin{macrocode}
+%<*scheme&(article|book|report|beamer)>
+%    \end{macrocode}
+%
+%    \begin{macrocode}
+\keys_set:nn { ctex / part }
+  {
+    aftertitle  = \par ,
+%<*article|book|report>
+    hang        = false ,
+%</article|book|report>
+%<*plain>
+    name        = \partname \space ,
+%<*article|book|report>
+    number      = \thepart ,
+%</article|book|report>
+%<*beamer>
+    number      = \insertromanpartnumber ,
+%</beamer>
+%</plain>
+%<*chinese>
+    number      = \chinese { part } ,
+%</chinese>
+%<*article>
+    beforeskip  = 4ex ,
+    afterskip   = 3ex ,
+%<*plain>
+    format      = \raggedright ,
+    nameformat  = \Large \bfseries ,
+    aftername   = \par \nobreak ,
+    titleformat = \huge \bfseries ,
+    afterindent = false
+%</plain>
+%<*chinese>
+    format      = \Large \bfseries \centering ,
+    aftername   = \quad ,
+    afterindent = true
+%</chinese>
+%</article>
+%<*book|report>
+    aftername   = \par \vskip 20 \p@ ,
+    beforeskip  = 0pt \@plus 1fil ,
+    afterskip   = 0pt \@plus 1fil ,
+    pagestyle   = plain ,
+    break       = \if@openright \cleardoublepage \else \clearpage \fi ,
+%<*plain>
+    format      = \centering ,
+    nameformat  = \huge \bfseries ,
+    titleformat = \Huge \bfseries
+%</plain>
+%<*chinese>
+    format      = \huge \bfseries \centering
+%</chinese>
+%</book|report>
+%<*beamer>
+    format      = \centering ,
+    nameformat  = \usebeamerfont { part ~ name }
+                  \usebeamercolor [fg] { part ~ name } ,
+    aftername   = \vskip 1em \par ,
+    titleformat = \usebeamerfont { part ~ title }
+%</beamer>
+  }
+%    \end{macrocode}
+%
+%    \begin{macrocode}
+%<*book|report>
+\keys_set:nn { ctex / chapter }
+  {
+    pagestyle   = plain ,
+    aftertitle  = \par ,
+    hang        = false ,
+    beforeskip  = 50 \p@ ,
+    afterskip   = 40 \p@ ,
+    lofskip     = 10 \p@ ,
+    lotskip     = 10 \p@ ,
+    break       = \if@openright \cleardoublepage \else \clearpage \fi ,
+%<*plain>
+    name        = \chaptername \space ,
+    number      = \thechapter ,
+    format      = \raggedright ,
+    nameformat  = \huge \bfseries ,
+    aftername   = \par \nobreak \vskip 20 \p@ ,
+    titleformat = \Huge \bfseries ,
+    afterindent = false ,
+    tocline     = \CTEXnumberline {#1} #2
+%</plain>
+%<*chinese>
+    number      = \chinese { chapter } ,
+    format      = \huge \bfseries \centering ,
+    aftername   = \quad ,
+    afterindent = true
+%</chinese>
+  }
+%</book|report>
+%    \end{macrocode}
+%
+%    \begin{macrocode}
+%<@@=>
+%    \end{macrocode}
+%
+%    \begin{macrocode}
+\keys_set:nn { ctex / section }
+  {
+%<*article|book|report>
+    number      = \thesection ,
+    aftername   = \quad ,
+    aftertitle  = \@@par ,
+    beforeskip  = 3.5ex \@plus 1ex \@minus .2ex ,
+    afterskip   = 2.3ex \@plus .2ex ,
+    runin       = false ,
+    break       = \addpenalty \@secpenalty ,
+%<*plain>
+    format      = \Large \bfseries ,
+    afterindent = false
+%</plain>
+%<*chinese>
+    format      = \Large \bfseries \centering ,
+    afterindent = true
+%</chinese>
+%</article|book|report>
+%<*beamer>
+%<*plain>
+    name        = \sectionname \space ,
+%</plain>
+    format      = \centering ,
+    number      = \insertsectionnumber ,
+    nameformat  = \usebeamerfont { section ~ name }
+                  \usebeamercolor [fg] { section ~ name } ,
+    aftername   = \vskip 1em \par ,
+    titleformat = \usebeamerfont { section ~ title } ,
+    aftertitle  = \par
+%</beamer>
+  }
+%    \end{macrocode}
+%
+%    \begin{macrocode}
+\keys_set:nn { ctex / subsection }
+  {
+%<*article|book|report>
+    number      = \thesubsection ,
+    format      = \large \bfseries ,
+    aftername   = \quad ,
+    aftertitle  = \@@par ,
+    beforeskip  = 3.25ex \@plus 1ex \@minus .2ex ,
+    afterskip   = 1.5ex  \@plus .2ex ,
+    runin       = false ,
+    break       = \addpenalty \@secpenalty ,
+%<*plain>
+    afterindent = false
+%</plain>
+%<*chinese>
+    afterindent = true
+%</chinese>
+%</article|book|report>
+%<*beamer>
+%<*plain>
+    name        = \subsectionname \space ,
+    number      = \insertsubsectionnumber ,
+%</plain>
+%<*chinese>
+    number      = \arabic { section } . \arabic { subsection } ,
+%</chinese>
+    format      = \centering ,
+    nameformat  = \usebeamerfont { subsection ~ name }
+                  \usebeamercolor [fg] { subsection ~ name } ,
+    aftername   = \vskip 1em \par ,
+    titleformat = \usebeamerfont { subsection ~ title } ,
+    aftertitle  = \par
+%</beamer>
+  }
+%    \end{macrocode}
+%
+%    \begin{macrocode}
+%<*article|book|report>
+%    \end{macrocode}
+%
+%    \begin{macrocode}
+\keys_set:nn { ctex / subsubsection }
+  {
+    number      = \thesubsubsection ,
+    format      = \normalsize \bfseries ,
+    aftername   = \quad ,
+    aftertitle  = \@@par ,
+    beforeskip  = 3.25ex \@plus 1ex \@minus .2ex ,
+    afterskip   = 1.5ex \@plus .2ex ,
+    runin       = false ,
+    break       = \addpenalty \@secpenalty ,
+%<*plain>
+    afterindent = false
+%</plain>
+%<*chinese>
+    afterindent = true
+%</chinese>
+  }
+%    \end{macrocode}
+%
+%    \begin{macrocode}
+\keys_set:nn { ctex / paragraph }
+  {
+    number      = \theparagraph ,
+    format      = \normalsize \bfseries ,
+    aftername   = \quad ,
+    beforeskip  = 3.25ex \@plus 1ex \@minus .2ex ,
+    break       = \addpenalty \@secpenalty ,
+%<*plain>
+    afterindent = false
+%</plain>
+%<*chinese>
+    afterindent = true
+%</chinese>
+  }
+%    \end{macrocode}
+%
+%    \begin{macrocode}
+\keys_set:nn { ctex / subparagraph }
+  {
+    number      = \thesubparagraph ,
+    format      = \normalsize \bfseries ,
+    aftername   = \quad ,
+    beforeskip  = 3.25ex \@plus 1ex \@minus .2ex ,
+    break       = \addpenalty \@secpenalty ,
+%<*plain>
+    afterindent = false
+%</plain>
+%<*chinese>
+    afterindent = true
+%</chinese>
+  }
+%    \end{macrocode}
+%
+% 处理 \opt{sub3section} 与 \opt{sub4section} 的格式。
+%    \begin{macrocode}
+\int_compare:nNnTF \g__ctex_section_depth_int > 2
+  {
+    \keys_set:nn { ctex / paragraph }
+      {
+        aftertitle  = \@@par ,
+        afterskip   = 1ex \@plus .2ex ,
+        runin       = false
+      }
+  }
+  {
+    \keys_set:nn { ctex / paragraph }
+      {
+        afterskip   = 1em ,
+        runin       = true
+      }
+  }
+\int_compare:nNnTF \g__ctex_section_depth_int > 3
+  {
+    \keys_set:nn { ctex / subparagraph }
+      {
+        aftertitle  = \@@par ,
+        afterskip   = 1ex \@plus .2ex ,
+        runin       = false
+      }
+  }
+  {
+    \keys_set:nn { ctex / subparagraph }
+      {
+        afterskip   = 1em ,
+        runin       = true
+      }
+  }
+\int_compare:nNnTF \g__ctex_section_depth_int > 2
+  { \keys_set:nn { ctex / subparagraph } { indent = \c_zero_dim } }
+  { \keys_set:nn { ctex / subparagraph } { indent = \parindent } }
+%    \end{macrocode}
+%
+%    \begin{macrocode}
+%<@@=ctex>
+%    \end{macrocode}
+%
+% 处理附录的格式。
+%    \begin{macrocode}
+\keys_set:nn { ctex / appendix }
+%<*article>
+  { number      = \@Alph \c@section }
+%</article>
+%<*book|report>
+  {
+    name        = \appendixname \space ,
+    number      = \@Alph \c@chapter
+  }
+%</book|report>
+%    \end{macrocode}
+%
+%    \begin{macrocode}
+%</article|book|report>
+%    \end{macrocode}
+%
+%    \begin{macrocode}
+%</scheme&(article|book|report|beamer)>
+%    \end{macrocode}
+%
+% \subsection{\pkg{ctex.sty} 的 \opt{heading} 选项}
+%
+%    \begin{macrocode}
+%<*ctex|ctexheading>
+%    \end{macrocode}
+%
+% \begin{variable}{\c_@@_std_class_tl}
+% 用于记录被引入的标准文档类。
+%    \begin{macrocode}
+\clist_map_inline:nn { article , book , report , beamer }
+  {
+    \@ifclassloaded {#1}
+      { \clist_map_break:n { \tl_const:Nn \c_@@_std_class_tl {#1} } }
+      { }
+  }
+%    \end{macrocode}
+% \end{variable}
+%
+% 若标准文档类被引入，则载入对应的标题定义文件。否则视 \tn{chapter} 是否有定义来
+% 引入 \cls{book} 或者 \cls{article}。
+%    \begin{macrocode}
+\msg_new:nnn { ctex } { not-standard-class }
+  {
+    None~of~the~standard~document~classes~was~loaded.\\
+    Heading~`#1'~is~selected.\\
+    ctex~may~not~work~as~expected.
+  }
+%<ctex>\bool_if:NTF \l_@@_heading_bool
+%<ctexheading>\use:n
+  {
+    \tl_if_exist:NTF \c_@@_std_class_tl
+      { \cs_new_eq:NN \c_@@_class_tl \c_@@_std_class_tl }
+      {
+        \cs_if_exist:NTF \chapter
+          {
+            \cs_if_exist:NF \if@mainmatter
+              { \cs_new_eq:NN \if@mainmatter \tex_iftrue:D }
+            \tl_const:Nn \c_@@_class_tl { book }
+          }
+          { \tl_const:Nn \c_@@_class_tl { article } }
+        \msg_warning:nnx { ctex } { not-standard-class } { \c_@@_class_tl }
+      }
+    \ctex_file_input:n { ctex- \c_@@_class_tl .def }
+  }
+%<ctex>  { \ctex_scheme_input:o { \l_@@_scheme_tl } }
+%    \end{macrocode}
+%
+%    \begin{macrocode}
+%</ctex|ctexheading>
+%    \end{macrocode}
+%
+% \subsection{标题配置文件}
+%
+%    \begin{macrocode}
+%<*name>
+%    \end{macrocode}
+%
+%    \begin{macrocode}
+\keys_set_known:nn { ctex }
+  {
+    contentsname   = 目录 ,
+    listfigurename = 插图 ,
+    listtablename  = 表格 ,
+    figurename     = 图 ,
+    tablename      = 表 ,
+    abstractname   = 摘要 ,
+    indexname      = 索引 ,
+    bibname        = 参考文献 ,
+    appendixname   = 附录 ,
+    proofname      = 证明 ,
+    algorithmname  = 算法 ,
+    refname        = 参考文献 ,
+    continuation   = （续） ,
+    part    / name = { 第 , 部分 } ,
+    chapter / name = { 第 , 章 }
+  }
+%    \end{macrocode}
+%
+%    \begin{macrocode}
+%</name>
+%    \end{macrocode}

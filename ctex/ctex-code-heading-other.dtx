@@ -1,0 +1,96 @@
+% \iffalse meta-comment
+%
+% Copyright (C) 2003--2020
+% CTEX.ORG and any individual authors listed elsewhere in this file.
+% --------------------------------------------------------------------------
+%
+% This work may be distributed and/or modified under the
+% conditions of the LaTeX Project Public License, either
+% version 1.3c of this license or (at your option) any later
+% version. This version of this license is in
+%    http://www.latex-project.org/lppl/lppl-1-3c.txt
+% and the latest version of this license is in
+%    http://www.latex-project.org/lppl.txt
+% and version 1.3 or later is part of all distributions of
+% LaTeX version 2005/12/01 or later.
+%
+% This work has the LPPL maintenance status `maintained'.
+%
+% The Current Maintainers of this work are Leo Liu, Qing Lee and Liam Huang.
+%
+% --------------------------------------------------------------------------
+%
+% \fi
+%
+% \section{其它中文标题定义}
+%
+% \begin{macro}[int]{\proofname}
+% \tn{proofname} 未在标准文档类中定义，需要确保它非空。
+%    \begin{macrocode}
+%<*class|ctex>
+\tl_if_exist:NF \proofname
+  {
+    \tl_new:N \proofname
+    \tl_set:Nn \proofname { Proof }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+%    \begin{macrocode}
+\keys_define:nn { ctex }
+  {
+    contentsname   .tl_set:N = \contentsname ,
+    listfigurename .tl_set:N = \listfigurename ,
+    listtablename  .tl_set:N = \listtablename ,
+    figurename     .tl_set:N = \figurename ,
+    tablename      .tl_set:N = \tablename ,
+    abstractname   .tl_set:N = \abstractname ,
+    indexname      .tl_set:N = \indexname ,
+    appendixname   .tl_set:N = \appendixname ,
+    proofname      .tl_set:N = \proofname ,
+%<article>    bibname        .tl_set:N = \refname
+%<book|report>    bibname        .tl_set:N = \bibname
+%<*beamer>
+    algorithmname  .tl_set:N = \algorithmname ,
+    bibname        .tl_set:N = \bibname ,
+    refname        .tl_set:N = \refname ,
+    continuation   .tl_set:N = \insertcontinuationtext
+%</beamer>
+  }
+%    \end{macrocode}
+%
+%    \begin{macrocode}
+%<*ctex>
+\msg_new:nnn { ctex } { ctexbibname }
+  {
+    Neither~`\token_to_str:N \bibname'~nor~`\token_to_str:N \refname'~can~be~found.\\
+    The~key~`bibname'~will~set~`\token_to_str:N \ctexbibname'~to~the~given~value.
+  }
+\tl_if_exist:NTF \insertcontinuationtext
+  {
+    \keys_define:nn { ctex }
+      {
+        algorithmname .tl_set:N = \algorithmname ,
+        bibname       .tl_set:N = \bibname ,
+        refname       .tl_set:N = \refname ,
+        continuation  .tl_set:N = \insertcontinuationtext
+      }
+  }
+  {
+    \tl_if_exist:NTF \bibname
+      { \keys_define:nn { ctex } { bibname .tl_set:N = \bibname } }
+      {
+        \tl_if_exist:NTF \refname
+          { \keys_define:nn { ctex } { bibname .tl_set:N = \refname } }
+          {
+            \msg_warning:nn { ctex } { ctexbibname }
+            \keys_define:nn { ctex } { bibname .tl_set:N = \ctexbibname }
+          }
+      }
+  }
+%</ctex>
+%    \end{macrocode}
+%
+%    \begin{macrocode}
+%</class|ctex>
+%    \end{macrocode}

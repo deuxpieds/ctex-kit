@@ -1,0 +1,245 @@
+% \iffalse meta-comment
+%
+% Copyright (C) 2003--2020
+% CTEX.ORG and any individual authors listed elsewhere in this file.
+% --------------------------------------------------------------------------
+%
+% This work may be distributed and/or modified under the
+% conditions of the LaTeX Project Public License, either
+% version 1.3c of this license or (at your option) any later
+% version. This version of this license is in
+%    http://www.latex-project.org/lppl/lppl-1-3c.txt
+% and the latest version of this license is in
+%    http://www.latex-project.org/lppl.txt
+% and version 1.3 or later is part of all distributions of
+% LaTeX version 2005/12/01 or later.
+%
+% This work has the LPPL maintenance status `maintained'.
+%
+% The Current Maintainers of this work are Leo Liu, Qing Lee and Liam Huang.
+%
+% --------------------------------------------------------------------------
+%
+% \fi
+%
+% \section{字距与缩进}
+%
+% \begin{macro}{autoindent}
+% \opt{autoindent} 也是可以用在正文中的选项，意义与宏包选项 |option/autoindent| 相同。
+%    \begin{macrocode}
+%<*class|ctex>
+\keys_define:nn { ctex }
+  {
+    autoindent .choice: ,
+    autoindent .default:n = { true } ,
+    autoindent / true    .code:n =
+      {
+        \tl_set:Nn \l_@@_autoindent_tl { 2 \ccwd }
+        \ctex_select_size:
+      } ,
+    autoindent / false   .code:n =
+      { \tl_clear:N \l_@@_autoindent_tl } ,
+    autoindent / unknown .code:n =
+      {
+        \ctex_set_default_ccwd:Nn \l_@@_autoindent_tl {#1}
+        \ctex_select_size:
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\CTEXsetfont}
+% 无论字体大小是否变化都更新相关信息。
+%    \begin{macrocode}
+\NewDocumentCommand \CTEXsetfont { } { \ctex_select_size: }
+\cs_new_protected_nopar:Npn \ctex_select_size:
+  { \cs_if_free:NTF \size@update { \ctex_update_size: } { \selectfont } }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[int]{\ctex_update_size:}
+% 在字号变化时更新 \tn{ccwd}、\tn{parindent} 和汉字间距。字距为零则恢复正常设置。
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \ctex_update_size:
+  {
+    \tl_if_eq:NNTF \l_@@_ziju_tl \c_@@_zero_tl
+      {
+        \ctex_update_stretch:
+        \ctex_update_parindent:
+      }
+      { \ctex_update_ziju: }
+  }
+\tl_const:Nx \c_@@_zero_tl { \fp_use:N \c_zero_fp }
+\tl_new:N \l_@@_ziju_tl
+\tl_set_eq:NN \l_@@_ziju_tl \c_@@_zero_tl
+%    \end{macrocode}
+% 在 \tn{selectfont} 中，若 \tn{size@update} 为 \tn{relax}，说明字体大小没有变化，
+% 我们也就不用更新相关参数。
+%    \begin{macrocode}
+\ctex_add_to_selectfont:n
+  { \cs_if_free:NF \size@update { \ctex_update_size: } }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{linestretch}
+% 若行宽不是汉字宽度的整数倍，自然要求伸展它们之间的差。这里设置的是在此基础上的
+% 额外伸展量。初始化为一个汉字的宽度。若设置为 \tn{maxdimen}，则禁用此功能。
+% 参数的默认单位是汉字的宽度 \tn{ccwd}。
+%    \begin{macrocode}
+\keys_define:nn { ctex }
+  {
+    linestretch .code:n =
+      {
+        \ctex_set_default_ccwd:Nn \l_@@_line_stretch_tl {#1}
+        \ctex_select_size:
+      } ,
+    linestretch .value_required:n = true
+  }
+\tl_new:N \l_@@_line_stretch_tl
+\tl_set:Nn \l_@@_line_stretch_tl { \ccwd }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[int]{\ctex_update_stretch:}
+% 首先计算一行上汉字的字数，\tn{CJKglue} 相当于将 \tn{linewidth} 与汉字总宽度之差
+% 均匀地填充到汉字之间。\hologo{eTeX} 的除法是四舍五入，而我们这里应该用截断。由于
+% 没有可展性的要求，直接用原语 \cs{tex_divide:D} 要比 \cs{int_div_truncate:nn}
+% 快一些。下面的算法还兼顾到了 \tn{linewidth} 不为汉字字宽的整数倍的情况。
+% 若用户禁用 \opt{linestretch} 并且修改过 \tn{CJKglue}，则只更新
+% \tn{ccwd}，否则设置伸展量为 $0.08$ 倍 \tn{baselineskip}。注意 \pkg{everysel} 的
+% 钩子位于 \tn{size@update} 之前，\tn{baselineskip} 还未更新，不能直接使用它。
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \ctex_update_stretch:
+  {
+    \ctex_update_em_unit:
+    \dim_set:Nn \l_@@_tmp_dim { \l_@@_line_stretch_tl }
+    \dim_compare:nNnTF \l_@@_tmp_dim = \c_max_dim
+      {
+        \ctex_if_ccglue_touched:TF
+          { \ctex_update_ccwd: }
+          {
+            \dim_set:Nn \l_@@_tmp_dim
+              { \baselinestretch \tex_glueexpr:D \f@baselineskip \scan_stop: }
+            \skip_set:Nn \l_@@_ccglue_skip
+              { \c_zero_dim plus .08 \l_@@_tmp_dim }
+            \ctex_update_ccglue:
+          }
+      }
+      {
+        \int_set:Nn \l_@@_tmp_int
+          { \tex_dimexpr:D \linewidth - \ccwd - \l_@@_tmp_dim \scan_stop: }
+        \tex_divide:D \l_@@_tmp_int \ccwd
+        \int_compare:nNnTF \l_@@_tmp_int > \c_zero_int
+          {
+            \skip_set:Nn \l_@@_ccglue_skip
+              {
+                \c_zero_dim plus \dim_eval:n
+                  {
+                    ( \linewidth - \ccwd - \l_@@_tmp_int \ccwd ) /
+                    \l_@@_tmp_int
+                  }
+              }
+          }
+          { \skip_zero:N \l_@@_ccglue_skip }
+        \ctex_update_ccglue:
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[int]{\ctex_update_parindent:}
+% 更新段落首行缩进。此函数在字号变化时调用。
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \ctex_update_parindent:
+  {
+    \tl_if_empty:NF \l_@@_autoindent_tl
+      {
+        \dim_compare:nNnF \parindent = \c_zero_dim
+          { \dim_set:Nn \parindent { \l_@@_autoindent_tl } }
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\ziju}
+% 若参数为 $0$，则恢复正常间距。
+%    \begin{macrocode}
+\NewDocumentCommand \ziju { m }
+  { \exp_args:Nx \ctex_ziju:n {#1} \tex_ignorespaces:D }
+\cs_new_protected_nopar:Npn \ctex_ziju:n #1
+  {
+    \tl_set:Nx \l_@@_ziju_tl { \fp_eval:n {#1} }
+    \ctex_select_size:
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[int]{\ctex_update_ziju:}
+% 更新字距。若字距不大于 $-1$，即 \tn{ccwd} 为非正值，则不计算伸缩值。
+% 否则，首先假定汉字的宽度为正常宽度加上字距，看一行上能正常放下多少个汉字。
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \ctex_update_ziju:
+  {
+    \ctex_update_em_unit:
+    \dim_set:Nn \l_@@_ziju_dim { \l_@@_ziju_tl \ccwd }
+    \dim_add:Nn \ccwd { \l_@@_ziju_dim }
+    \dim_compare:nNnTF \ccwd > \c_zero_dim
+%    \end{macrocode}
+% 伸展量保证行内的剩余空白能够被均匀地填充到汉字之间，收缩的最大限度是让当前行
+% 还能够再挤下一个汉字并且不会出现负间距。由 \TeX{} 决定伸展还是收缩。
+%    \begin{macrocode}
+      {
+        \dim_set:Nn \l_@@_tmp_dim
+          { \linewidth - \ccwd + \l_@@_ziju_dim }
+        \int_set:Nn \l_@@_tmp_int { \l_@@_tmp_dim }
+        \tex_divide:D \l_@@_tmp_int \ccwd
+        \dim_sub:Nn \l_@@_tmp_dim { \l_@@_tmp_int \ccwd }
+%    \end{macrocode}
+% 由于 \tn{parindent} 是一个固定值，并不参与伸缩，容易导致第一行出现坏盒子。
+% 我们在这里将字数减去 $2$，以此放大伸缩值。
+%    \begin{macrocode}
+        \dim_compare:nNnF \parindent = \c_zero_dim
+          {
+            \int_compare:nNnF \l_@@_tmp_int < 3
+              { \int_sub:Nn \l_@@_tmp_int { 2 } }
+          }
+        \skip_set:Nn \l_@@_ccglue_skip
+          {
+            \l_@@_ziju_dim
+            plus  \dim_eval:n { \l_@@_tmp_dim / \l_@@_tmp_int }
+            minus \dim_min:nn { \dim_abs:n { \l_@@_ziju_dim } }
+              { ( \ccwd - \l_@@_tmp_dim ) / ( \l_@@_tmp_int + 1 ) }
+          }
+      }
+      { \skip_set:Nn \l_@@_ccglue_skip { \l_@@_ziju_dim } }
+    \ctex_update_ccglue:
+%    \end{macrocode}
+% 字距设置得比较大时，为了尽量保证段首缩进能够与下一行对齐，应该需要相应地加上
+% 或者减去伸缩值。但是这里并不清楚 \TeX{} 是伸展还是收缩，之前以“当前行是否还
+% 放得下一个汉字”为标准加上或减去伸缩值的做法也未必与实际结果一致，所以只好还
+% 是设置为 |2\ccwd|。
+%    \begin{macrocode}
+    \ctex_update_parindent:
+  }
+\dim_new:N \l_@@_ziju_dim
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\CTEXindent,\CTEXnoindent}
+% 过时命令。
+%    \begin{macrocode}
+\NewDocumentCommand \CTEXindent { }
+  {
+    \msg_warning:nnnn { ctex } { deprecated-command } { \CTEXindent }
+      { \parindent is~ set~ to~ 2\ccwd. }
+    \ctex_update_ccwd: \dim_set:Nn \parindent { 2 \ccwd }
+  }
+\NewDocumentCommand \CTEXnoindent { }
+  {
+    \msg_warning:nnnn { ctex } { deprecated-command } { \CTEXnoindent }
+      { \parindent is~ set~ to~ 0pt. }
+    \dim_zero:N \parindent
+  }
+%</class|ctex>
+%    \end{macrocode}
+% \end{macro}

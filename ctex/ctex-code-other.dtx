@@ -1,0 +1,75 @@
+% \iffalse meta-comment
+%
+% Copyright (C) 2003--2020
+% CTEX.ORG and any individual authors listed elsewhere in this file.
+% --------------------------------------------------------------------------
+%
+% This work may be distributed and/or modified under the
+% conditions of the LaTeX Project Public License, either
+% version 1.3c of this license or (at your option) any later
+% version. This version of this license is in
+%    http://www.latex-project.org/lppl/lppl-1-3c.txt
+% and the latest version of this license is in
+%    http://www.latex-project.org/lppl.txt
+% and version 1.3 or later is part of all distributions of
+% LaTeX version 2005/12/01 or later.
+%
+% This work has the LPPL maintenance status `maintained'.
+%
+% The Current Maintainers of this work are Leo Liu, Qing Lee and Liam Huang.
+%
+% --------------------------------------------------------------------------
+%
+% \fi
+%
+% \section{其它功能}
+%
+%    \begin{macrocode}
+%<*class|ctex>
+%    \end{macrocode}
+%
+% \begin{macro}{\CTeX}
+% \file{ctex-faq.sty} 中的定义是
+% \begin{verbatim}
+%   \DeclareRobustCommand\CTeX{$\mathbb{C}$\kern-.05em\TeX}
+% \end{verbatim}
+% 然而 \tn{mathbb} 未必有定义，这里就不采用它了，只定义最简单的形式。
+% \CTeX{} 可以直接用在 PDF 书签中。
+%    \begin{macrocode}
+\NewDocumentCommand \CTeX { }
+  { C \TeX }
+\ctex_at_end_package:nn { hyperref }
+  { \pdfstringdefDisableCommands { \tl_set:Nn \CTeX { CTeX } } }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{captiondelimiter}
+% 过时选项。
+%    \begin{macrocode}
+\keys_define:nn { ctex }
+  {
+    captiondelimiter .code:n =
+      {
+        \msg_warning:nnn { ctex } { deprecated-option }
+          { You~can~load~the~package~`caption'~to~get~its~functionality. }
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+%    \begin{macrocode}
+%</class|ctex>
+%    \end{macrocode}
+%
+% \subsection{列表环境的缩进}
+%
+% \begin{macro}[int]{\verse,\quotation}
+% 只在使用文档类的时候修改诗歌和引用环境的缩进。
+%    \begin{macrocode}
+%<*scheme&chinese&(article|book|report)>
+\ctex_patch_cmd:Nnn \verse { -1.5em } { -2 \ccwd }
+\ctex_patch_cmd:Nnn \verse {  1.5em } {  2 \ccwd }
+\ctex_patch_cmd:Nnn \quotation { 1.5em } { 2 \ccwd }
+%</scheme&chinese&(article|book|report)>
+%    \end{macrocode}
+% \end{macro}

@@ -1,0 +1,90 @@
+% \iffalse meta-comment
+%
+% Copyright (C) 2003--2020
+% CTEX.ORG and any individual authors listed elsewhere in this file.
+% --------------------------------------------------------------------------
+%
+% This work may be distributed and/or modified under the
+% conditions of the LaTeX Project Public License, either
+% version 1.3c of this license or (at your option) any later
+% version. This version of this license is in
+%    http://www.latex-project.org/lppl/lppl-1-3c.txt
+% and the latest version of this license is in
+%    http://www.latex-project.org/lppl.txt
+% and version 1.3 or later is part of all distributions of
+% LaTeX version 2005/12/01 or later.
+%
+% This work has the LPPL maintenance status `maintained'.
+%
+% The Current Maintainers of this work are Leo Liu, Qing Lee and Liam Huang.
+%
+% --------------------------------------------------------------------------
+%
+% \fi
+%
+% \section{中文数字与日期}
+%
+%    \begin{macrocode}
+%<*class|ctex>
+\PassOptionsToPackage { encoding = \g_@@_encoding_tl } { zhnumber }
+\RequirePackage { zhnumber }
+%    \end{macrocode}
+%
+% \begin{macro}{\chinese}
+%    \begin{macrocode}
+\cs_new_nopar:Npn \chinese { \zhnum_counter:n }
+\cs_new_eq:NN \@chinese \@zhnum
+\cs_new_eq:NN \Chinese \chinese
+\cs_new_eq:NN \CTEXcounter \use_none:n
+%    \end{macrocode}
+% \end{macro}
+%
+% 给 \pkg{enumitem} 宏包注册 \tn{chinese}、\tn{zhnum} 和 \tn{zhdig}。
+%    \begin{macrocode}
+\ctex_at_end_package:nn { enumitem }
+  {
+    \cs_if_free:NF \AddEnumerateCounter
+      {
+        \AddEnumerateCounter * { \zhnum }   { \@zhnum } { 1 }
+        \AddEnumerateCounter * { \zhdig }   { \@zhdig } { 1 }
+        \AddEnumerateCounter * { \chinese } { \@chinese } { 1 }
+      }
+  }
+%    \end{macrocode}
+%
+% \begin{macro}{\CTEXnumber,\CTEXdigits}
+%    \begin{macrocode}
+\NewDocumentCommand \CTEXnumber { m m }
+  { \protected@edef #1 { \zhnumber {#2} } }
+\NewDocumentCommand \CTEXdigits { m m }
+  { \protected@edef #1 { \zhdigits {#2} } }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{today}
+%    \begin{macrocode}
+\cs_set_eq:NN \CTEX@todayold \today
+\keys_define:nn { ctex }
+  {
+    today .choice: ,
+    today / old     .code:n =
+      { \cs_set_eq:NN \today \CTEX@todayold } ,
+    today / small   .code:n =
+      {
+        \cs_set_eq:NN \today \zhtoday
+        \zhnumsetup { time = Arabic }
+      } ,
+    today / big     .code:n =
+      {
+        \cs_set_eq:NN \today \zhtoday
+        \zhnumsetup { time = Chinese }
+      } ,
+    today / unknown .code:n =
+      { \msg_error:nnx { ctex } { today-undef } {#1} }
+  }
+\msg_new:nnnn { ctex } { today-undef }
+  { Today~format~`#1'~is~undefined. }
+  { Available~today~formats~are~`old',~`small',~and~`big'. }
+%</class|ctex>
+%    \end{macrocode}
+% \end{macro}

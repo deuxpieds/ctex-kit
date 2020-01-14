@@ -1,0 +1,237 @@
+% \iffalse meta-comment
+%
+% Copyright (C) 2003--2020
+% CTEX.ORG and any individual authors listed elsewhere in this file.
+% --------------------------------------------------------------------------
+%
+% This work may be distributed and/or modified under the
+% conditions of the LaTeX Project Public License, either
+% version 1.3c of this license or (at your option) any later
+% version. This version of this license is in
+%    http://www.latex-project.org/lppl/lppl-1-3c.txt
+% and the latest version of this license is in
+%    http://www.latex-project.org/lppl.txt
+% and version 1.3 or later is part of all distributions of
+% LaTeX version 2005/12/01 or later.
+%
+% This work has the LPPL maintenance status `maintained'.
+%
+% The Current Maintainers of this work are Leo Liu, Qing Lee and Liam Huang.
+%
+% --------------------------------------------------------------------------
+%
+% \fi
+%
+% \section{内部函数与变量}
+%
+% \begin{variable}{\l_@@_tmp_tl,\l_@@_tmp_int,\l_@@_tmp_box,\l_@@_tmp_dim}
+% 临时变量。
+%    \begin{macrocode}
+%<*class|ctex|ctexheading>
+\tl_clear_new:N \l_@@_tmp_tl
+\int_new:N \l_@@_tmp_int
+\box_new:N \l_@@_tmp_box
+%<!ctexheading>\dim_new:N \l_@@_tmp_dim
+%    \end{macrocode}
+% \end{variable}
+%
+% \begin{macro}[int]{\ctex_file_wrapper:nnn}
+% 设置文件操作的 \tn{catcode} 环境，参数 |#1| 是设置，|#2| 是文件操作，|#3| 是恢复。
+% 默认关闭 \LaTeXiii{} 语法环境，并设置 |@| 的 \tn{catcode} 为 $11$。
+%    \begin{macrocode}
+\cs_new_protected:Npn \ctex_file_wrapper:nnn #1#2#3
+  {
+    \use:x
+      {
+        \ExplSyntaxOff
+        \char_set_catcode_letter:n { 64 }
+        #1
+        \exp_not:n {#2}
+        \bool_if:NTF \l__kernel_expl_bool
+          { \ExplSyntaxOn }
+          { \ExplSyntaxOff }
+        \char_set_catcode:nn { 64 } { \char_value_catcode:n { 64 } }
+        #3
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[int]{\ctex_file_input:n}
+% 输入文件。
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \ctex_file_input:n #1
+  { \ctex_file_wrapper:nnn { } { \file_input:n {#1} } { } }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[int]{\ctex_scheme_input:n}
+% 输入 \opt{scheme} 文件。先查找当前文档类下的 \meta{scheme}，找不到再查找一般的文件。
+%    \begin{macrocode}
+\cs_new_protected_nopar:Npn \ctex_scheme_input:n #1
+  {
+    \ctex_file_wrapper:nnn
+      { }
+      {
+        \tl_if_exist:NTF \c_@@_class_tl
+          {
+            \file_if_exist_input:nF { ctex-scheme- #1 - \c_@@_class_tl .def }
+              { \file_input:n  { ctex-scheme- #1 .def } }
+          }
+          { \file_input:n  { ctex-scheme- #1 .def } }
+      }
+      { }
+  }
+\cs_generate_variant:Nn \ctex_scheme_input:n { o }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{variable}{\g_@@_section_depth_int}
+% 若大于 |3|，则 \tn{paragraph} 和 \tn{subparagraph} 标题单独占一行；若为 |3|，则
+% \tn{paragraph} 单独占一行。
+%    \begin{macrocode}
+%<*!beamer>
+\int_new:N \g_@@_section_depth_int
+\int_gset:Nn \g_@@_section_depth_int { 2 }
+%</!beamer>
+%    \end{macrocode}
+% \end{variable}
+%
+%    \begin{macrocode}
+%</class|ctex|ctexheading>
+%<*class|ctex>
+%    \end{macrocode}
+%
+% 对旧版本的宏包给出错误信息。
+%    \begin{macrocode}
+\msg_new:nnnn { ctex } { package-too-old }
+  { Support~package~`#1'~too~old. }
+  {
+    Please~update~an~up~to~date~version~of~the~package~`#1'\\
+    using~your~TeX~package~manager~or~from~CTAN.
+  }
+%    \end{macrocode}
+%
+% \begin{macro}[int]{\ifctexpdf}
+% 在 \pkg{zhmetrics} 映射文件中使用。
+%    \begin{macrocode}
+\sys_if_output_pdf:TF
+  { \cs_new_eq:NN \ifctexpdf \if_true: }
+  { \cs_new_eq:NN \ifctexpdf \if_false: }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[int]{\ctex_if_preamble:TF}
+% 测试是否在 \LaTeXe{} 的导言区。在宏包内部初始为真，文档最开始位置再设置为假。
+% 注意，钩子 \cs{ctex_after_end_preamble:n} 在 \tn{AtBeginDocument} 之后执行，
+% 可以与 \tn{@onlypreamble} 的行为一致。
+%    \begin{macrocode}
+\cs_new_eq:NN \ctex_if_preamble:TF \use_i:nn
+\ctex_after_end_preamble:n { \cs_set_eq:NN \ctex_if_preamble:TF \use_ii:nn }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[int]{\ctex_set_default_ccwd:Nn}
+% 若参数 |#2| 带长度单位，则设置它为 |tl| 变量 |#1| 的值，否则以 \tn{ccwd} 为单位。
+%    \begin{macrocode}
+\cs_new_protected:Npn \ctex_set_default_ccwd:Nn #1#2
+  { \tl_set:Nx #1 { \@@_default_ccwd_aux:n {#2} } }
+\cs_new:Npn \@@_default_ccwd_aux:n #1
+  {
+    \exp_not:n {#1}
+    \exp_after:wN \@@_default_ccwd_aux:w
+      \dim_use:N \tex_dimexpr:D #1 pt \scan_stop: \q_stop
+  }
+\exp_last_unbraced:NNNNo
+  \cs_new:Npn \@@_default_ccwd_aux:w #1 { \tl_to_str:n { pt } } #2 \q_stop
+    { \tl_if_empty:nT {#2} { \ccwd } }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{variable}{\g_@@_encoding_tl}
+% 所有引擎下默认编码均设为 UTF-8。
+%    \begin{macrocode}
+\tl_new:N \g_@@_encoding_tl
+\tl_set:Nn \g_@@_encoding_tl { UTF8 }
+%    \end{macrocode}
+% \end{variable}
+%
+% \begin{variable}{\g_@@_zhmCJK_bool}
+% 是否使用 \pkg{zhmCJK} 宏包。
+%    \begin{macrocode}
+\bool_new:N \g_@@_zhmCJK_bool
+%    \end{macrocode}
+% \end{variable}
+%
+% \begin{variable}{\l_@@_autoindent_tl}
+% 保存 \opt{autoindent} 选项的值，空值表示不自动调整首行缩进。
+%    \begin{macrocode}
+\tl_new:N \l_@@_autoindent_tl
+%    \end{macrocode}
+% \end{variable}
+%
+% \begin{macro}[int]{\ctex_if_autoindent_touched:F}
+% 检查 \opt{autoindent} 选项是否被用户设置。
+%    \begin{macrocode}
+\cs_new_eq:NN \ctex_if_autoindent_touched:F \use:n
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[int]{\ctex_zhmap_case:nnn}
+% 参数 |#1| 是 \pkg{zhmCJK} 的内容，|#2| 是 \pkg{zhmetrics}。
+%    \begin{macrocode}
+\cs_new_eq:NN \ctex_zhmap_case:nnn \use_ii:nnn
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[int]{\ctex_at_end:n}
+% 区分 \tn{AtEndOfClass} 和 \tn{AtEndOfPackage}，虽然它们的意思都是一样的。
+%    \begin{macrocode}
+%<class>\cs_new_protected_nopar:Npn \ctex_at_end:n { \AtEndOfClass }
+%<ctex>\cs_new_protected_nopar:Npn \ctex_at_end:n { \AtEndOfPackage }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{variable}{\g_@@_std_options_clist}
+% 保存传递给标准文档类的选项。
+%    \begin{macrocode}
+%<*class>
+\clist_new:N \g_@@_std_options_clist
+%</class>
+%    \end{macrocode}
+% \end{variable}
+%
+% 对无效选项给出警告。
+%    \begin{macrocode}
+\msg_new:nnn { ctex } { invalid-option }
+  { Option~`\l_keys_key_tl'~is~invalid~in~current~mode. }
+\msg_new:nnn { ctex } { invalid-value }
+  { Value~`#1'~is~invalid~for~the~key~`\l_keys_key_tl'. }
+%    \end{macrocode}
+%
+% 对过时选项或命令给出警告。
+%    \begin{macrocode}
+\msg_new:nnn { ctex } { deprecated-option }
+  { Option~ `\l_keys_key_tl'~ is~ deprecated.\\ #1 }
+\msg_new:nnn { ctex } { deprecated-command }
+  { Command~ #1 is~ deprecated.\\ #2 }
+\msg_new:nnn { ctex } { deprecated-environment }
+  { Environment~ `#1'~ is~ deprecated.\\ #2 }
+%    \end{macrocode}
+%
+%    \begin{macrocode}
+%</class|ctex>
+%    \end{macrocode}
+%
+% \begin{variable}{\g_@@_font_size_int}
+% |0| 表示修改默认字体大小为五号，|1| 为小四号，大于 1 则不作修改。初始值 |-1|
+% 表示 \opt{zihao} 选项未初始化，会在将来根据文档类决定初值。
+%    \begin{macrocode}
+%<*class|ctex|ctexsize>
+\int_new:N \g_@@_font_size_int
+\int_set:Nn \g_@@_font_size_int { -1 }
+%</class|ctex|ctexsize>
+%    \end{macrocode}
+% \end{variable}
+%
+% \section{宏包选项}

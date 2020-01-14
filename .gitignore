@@ -10,7 +10,6 @@
 *.idx
 *.ilg
 *.ind
-*.ins
 *.log
 *.out
 *.swp
@@ -32,54 +31,44 @@ CJKpunct/CJKpunct.pdf
 
 # ctex
 
-ctex/README.md
 ctex/build/
-ctex/ctex-article.def
-ctex/ctex-book.def
+ctex/ctex-*.def
 ctex/ctex-c5size.clo
 ctex/ctex-cs4size.clo
-ctex/ctex-engine-luatex.def
-ctex/ctex-engine-pdftex.def
-ctex/ctex-engine-xetex.def
-ctex/ctex-fontset-adobe.def
-ctex/ctex-fontset-fandol.def
-ctex/ctex-fontset-founder.def
-ctex/ctex-fontset-mac.def
-ctex/ctex-fontset-ubuntu.def
-ctex/ctex-fontset-windows.def
-ctex/ctex-fontset-windowsnew.def
-ctex/ctex-fontset-windowsold.def
+ctex/ctex-engine-*.def
+ctex/ctex-fontset-*.def
 ctex/ctex-name-gbk.cfg
 ctex/ctex-name-utf8.cfg
-ctex/ctex-report.def
-ctex/ctex-scheme-chinese-article.def
-ctex/ctex-scheme-chinese-book.def
-ctex/ctex-scheme-chinese-report.def
-ctex/ctex-scheme-chinese.def
-ctex/ctex-scheme-plain-article.def
-ctex/ctex-scheme-plain-book.def
-ctex/ctex-scheme-plain-report.def
-ctex/ctex-scheme-plain.def
+ctex/ctex-scheme-*.def
 ctex/ctex.cfg
 ctex/ctex.log
 ctex/ctex.pdf
+ctex/ctex-code.pdf
 ctex/ctex.sty
 ctex/ctexart.cls
+ctex/ctexbeamer.cls
 ctex/ctexbook.cls
 ctex/ctexcap.sty
 ctex/ctexheading.sty
+ctex/ctexhook.sty
+ctex/ctexpatch.sty
 ctex/ctexmakespa.tex
 ctex/ctexopts.cfg
 ctex/ctexrep.cls
 ctex/ctexsize.sty
 ctex/ctexspa.def
 ctex/ctexspamacro.tex
+ctex/ctxdoc.cls
+ctex/ctxdocstrip.tex
 ctex/test*.*
 ctex/zhadobefonts.tex
 ctex/zhfandolfonts.tex
+ctex/zhmacfonts.tex
 ctex/zhfounderfonts.tex
 ctex/zhubuntufonts.tex
 ctex/zhwindowsfonts.tex
+ctex/translator-theorem-dictionary-ChineseGBK.dict
+ctex/translator-theorem-dictionary-ChineseUTF8.dict
 
 # tool
 

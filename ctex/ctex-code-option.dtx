@@ -1,0 +1,477 @@
+% \iffalse meta-comment
+%
+% Copyright (C) 2003--2020
+% CTEX.ORG and any individual authors listed elsewhere in this file.
+% --------------------------------------------------------------------------
+%
+% This work may be distributed and/or modified under the
+% conditions of the LaTeX Project Public License, either
+% version 1.3c of this license or (at your option) any later
+% version. This version of this license is in
+%    http://www.latex-project.org/lppl/lppl-1-3c.txt
+% and the latest version of this license is in
+%    http://www.latex-project.org/lppl.txt
+% and version 1.3 or later is part of all distributions of
+% LaTeX version 2005/12/01 or later.
+%
+% This work has the LPPL maintenance status `maintained'.
+%
+% The Current Maintainers of this work are Leo Liu, Qing Lee and Liam Huang.
+%
+% --------------------------------------------------------------------------
+%
+% \fi
+%
+% \section{宏包选项}
+%
+%   \begin{macrocode}
+%<*class|style>
+\keys_define:nn { ctex / option }
+  {
+%</class|style>
+%    \end{macrocode}
+%
+% \begin{macro}{zihao}
+%    \begin{macrocode}
+%<*class|ctex|ctexsize>
+    zihao .choice: ,
+    zihao .value_required:n = true ,
+    zihao /     5  .code:n = { \int_gset:Nn \g_@@_font_size_int { 0 } } ,
+    zihao /    -4  .code:n = { \int_gset:Nn \g_@@_font_size_int { 1 } } ,
+    zihao / false  .code:n = { \int_gset:Nn \g_@@_font_size_int { 2 } } ,
+%<ctexsize>  }
+%</class|ctex|ctexsize>
+%<*class|ctex>
+    c5size  .code:n =
+      {
+        \msg_warning:nnn { ctex } { deprecated-option }
+          { Option~ `zihao=5'~ is~ set. }
+        \keys_set:nn { ctex / option } { zihao = 5 }
+      } ,
+    cs4size  .code:n =
+      {
+        \msg_warning:nnn { ctex } { deprecated-option }
+          { Option~ `zihao=-4'~ is~ set. }
+        \keys_set:nn { ctex / option } { zihao = -4 }
+      } ,
+    c5size  .value_forbidden:n = true ,
+    cs4size .value_forbidden:n = true ,
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{linespread}
+% 行距初始值为标志 \texttt{nan}，用于检查用户是否设置了 \opt{linespread} 选项。
+%    \begin{macrocode}
+    linespread  .fp_set:N = \l_@@_line_spread_fp ,
+    linespread .initial:n = { \c_nan_fp } ,
+    linespread .value_required:n = true ,
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{autoindent}
+% 自动调整段落的首行缩进功能。
+%    \begin{macrocode}
+    autoindent .choice: ,
+    autoindent .default:n = { true } ,
+    autoindent / true    .code:n =
+      {
+        \tl_set:Nn \l_@@_autoindent_tl { 2 \ccwd }
+        \cs_set_eq:NN \ctex_if_autoindent_touched:F \use_none:n
+      } ,
+    autoindent / false   .code:n =
+      {
+        \tl_clear:N \l_@@_autoindent_tl
+        \cs_set_eq:NN \ctex_if_autoindent_touched:F \use_none:n
+      } ,
+    autoindent / unknown .code:n =
+      {
+        \ctex_set_default_ccwd:Nn \l_@@_autoindent_tl {#1}
+        \cs_set_eq:NN \ctex_if_autoindent_touched:F \use_none:n
+      } ,
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{indent}
+% 仅为兼容性保留，已过时。
+%    \begin{macrocode}
+    indent .code:n =
+      {
+        \msg_warning:nnn { ctex } { deprecated-option }
+          {
+            The~ functionality~ has~ been~ removed.\\
+            It's~ better~ to~ set~ the~ heading~ styles~ via~ `afterindent'~
+            options.~
+          }
+      } ,
+    indent .value_forbidden:n = true ,
+    noindent .code:n =
+      {
+        \msg_warning:nnn { ctex } { deprecated-option }
+          {
+            The~ functionality~ has~ been~ removed.\\
+            It's~ better~ to~ set~ the~ heading~ styles~ via~ `afterindent'~
+            options.
+          }
+      } ,
+    noindent .value_forbidden:n = true ,
+%    \end{macrocode}
+% \end{macro}
+%
+% \changes{v2.5}{2019/11/10}{所有引擎下默认编码均设为 UTF-8。}
+%
+% \begin{macro}{GBK,UTF8}
+% 文档编码，默认为 UTF-8。
+%   \begin{macrocode}
+    GBK  .code:n =
+      {
+        \sys_if_engine_pdftex:TF
+          { \tl_gset:Nn \g_@@_encoding_tl { GBK } }
+          {
+            \msg_warning:nn { ctex } { invalid-option }
+            \tl_gset:Nn \g_@@_encoding_tl { UTF8 }
+          }
+      } ,
+    UTF8 .code:n = { \tl_gset:Nn \g_@@_encoding_tl { UTF8 } } ,
+    GBK  .value_forbidden:n = true ,
+    UTF8 .value_forbidden:n = true ,
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{fontset}
+% 初始值为空。若用户未指定，则根据操作系统载入对应字体配置，可以区分 Windows、
+% Mac~OS~X 和其它。
+%   \begin{macrocode}
+    fontset    .tl_gset:N = \g_@@_fontset_tl ,
+    nofonts    .code:n =
+      {
+        \msg_warning:nnn { ctex } { deprecated-option }
+          {
+            Option~ `fontset=none'~ is~ set.~ It~ is~ better~ to~ use~
+            fontset~ option.
+          }
+        \keys_set:nn { ctex / option } { fontset = none }
+      } ,
+    adobefonts .code:n =
+      {
+        \msg_warning:nnn { ctex } { deprecated-option }
+          {
+            Option~ `fontset=adobe'~ is~ set.~ It~ is~ better~ to~ use~
+            fontset~ option.
+          }
+        \keys_set:nn { ctex / option } { fontset = adobe }
+      } ,
+    winfonts   .code:n =
+      {
+        \msg_warning:nnn { ctex } { deprecated-option }
+          {
+            Option~ `fontset=windows'~ is~ set.~ It~ is~ better~ to~ use~
+            fontset~ option.
+          }
+        \keys_set:nn { ctex / option } { fontset = windows }
+      } ,
+    nofonts    .value_forbidden:n = true ,
+    winfonts   .value_forbidden:n = true ,
+    adobefonts .value_forbidden:n = true ,
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{zhmap}
+%   \begin{macrocode}
+    zhmap .choice: ,
+    zhmap .default:n = { true } ,
+    zhmap / zhmCJK .code:n =
+      {
+        \bool_gset_true:N \g_@@_zhmCJK_bool
+        \cs_gset_eq:NN \ctex_zhmap_case:nnn \use_i:nnn
+      } ,
+    zhmap / true   .code:n =
+      {
+        \bool_gset_false:N \g_@@_zhmCJK_bool
+        \cs_gset_eq:NN \ctex_zhmap_case:nnn \use_ii:nnn
+      } ,
+    zhmap / false  .code:n =
+      {
+        \bool_gset_false:N \g_@@_zhmCJK_bool
+        \cs_gset_eq:NN \ctex_zhmap_case:nnn \use_iii:nnn
+      } ,
+    nozhmap   .code:n =
+      {
+        \msg_warning:nnn { ctex } { deprecated-option }
+          { Option~ `zhmap=false'~ is~ set. }
+        \keys_set:nn { ctex / option } { zhmap = false }
+      } ,
+    nozhmap   .value_forbidden:n = true ,
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{punct}
+% 设置标点符号输出格式。
+%   \begin{macrocode}
+    punct   .tl_set:N = \l_@@_punct_tl ,
+    punct  .default:n = { quanjiao } ,
+    punct  .initial:n = { quanjiao } ,
+    nopunct   .code:n =
+      {
+        \msg_warning:nnn { ctex } { deprecated-option }
+          { Option~ `punct=plain'~ is~ set.  }
+        \keys_set:nn { ctex / option } { punct = plain }
+      } ,
+    nopunct   .value_forbidden:n = true ,
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{space}
+%   \begin{macrocode}
+    space .choices:nn =
+      { true , auto , false }
+      {
+        \exp_args:Nx \ctex_at_end:n
+          { \keys_set:nn { ctex } { space = \l_keys_choice_tl } }
+      } ,
+    space  .default:n = { true } ,
+    nospace   .code:n =
+      {
+        \msg_warning:nnn { ctex } { deprecated-option }
+          { Option~ `space=false'~ is~ set. }
+        \keys_set:nn { ctex / option } { space = false }
+      } ,
+    nospace   .value_forbidden:n = true ,
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{heading}
+%   \begin{macrocode}
+    heading .bool_set:N = \l_@@_heading_bool ,
+%    \end{macrocode}
+% \end{macro}
+%
+%    \begin{macrocode}
+%</class|ctex>
+%<*class|ctex|ctexheading>
+%    \end{macrocode}
+%
+% \begin{macro}{sub3section,sub4section}
+% \begin{macrocode}
+%<*!beamer>
+    sub3section .code:n =
+      { \int_gset:Nn \g_@@_section_depth_int { 3 } } ,
+    sub4section .code:n =
+      { \int_gset:Nn \g_@@_section_depth_int { 4 } } ,
+    sub3section .value_forbidden:n = true ,
+    sub4section .value_forbidden:n = true ,
+%</!beamer>
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{scheme}
+%    \begin{macrocode}
+    scheme .tl_set:N  = \l_@@_scheme_tl ,
+%<*ctexheading>
+    scheme .default:n = { plain } ,
+    scheme .initial:n = { plain }
+  }
+%</ctexheading>
+%<*!ctexheading>
+    scheme .default:n = { chinese } ,
+    scheme .initial:n = { chinese } ,
+%</!ctexheading>
+%    \end{macrocode}
+% \end{macro}
+%
+%    \begin{macrocode}
+%</class|ctex|ctexheading>
+%<*class|ctex>
+%    \end{macrocode}
+%
+% \begin{macro}{cap,nocap}
+% \opt{cap} 和 \opt{nocap} 是过时选项。
+% \begin{macrocode}
+    cap    .code:n    =
+      {
+        \msg_warning:nnn { ctex } { deprecated-option }
+          { Option~ `scheme = chinese' ~ is~ set. }
+        \keys_set:nn { ctex / option } { scheme = chinese }
+      } ,
+    nocap  .code:n    =
+      {
+        \msg_warning:nnn { ctex } { deprecated-option }
+          { Option~ `scheme = plain' ~ is~ set. }
+        \keys_set:nn { ctex / option } { scheme = plain }
+      } ,
+    cap    .value_forbidden:n = true ,
+    nocap  .value_forbidden:n = true ,
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{fntef,fancyhdr,hyperref}
+% 这些都是过时的宏包兼容选项，原选项功能总是打开的。
+%   \begin{macrocode}
+    fntef .code:n =
+      {
+        \sys_if_engine_xetex:TF
+          {
+            \msg_warning:nnn { ctex } { deprecated-option }
+              { `xeCJKfntef'~package~is~loaded. }
+            \RequirePackage { xeCJKfntef }
+          }
+          {
+            \sys_if_engine_pdftex:TF
+              {
+                \msg_warning:nnn { ctex } { deprecated-option }
+                  { `CJKfntef'~package~is~loaded. }
+                \RequirePackage { CJKfntef }
+              }
+              {
+                \msg_warning:nnn { ctex } { deprecated-option }
+                  { Furthermore,~option~`fntef'~is~invalid~in~current~mode. }
+              }
+          }
+      } ,
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{fancyhdr}
+%   \begin{macrocode}
+    fancyhdr .code:n =
+      {
+        \msg_warning:nnn { ctex } { deprecated-option }
+          { `fancyhdr'~package~is~loaded. }
+        \RequirePackage { fancyhdr }
+      } ,
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{hyperref}
+% \changes{v2.1}{2015/06/03}{补充定义 \tn{hypersetup}。}
+%   \begin{macrocode}
+    hyperref .code:n =
+      {
+        \msg_warning:nnn { ctex } { deprecated-option }
+          { `hyperref'~package~will~be~loaded. }
+        \ctex_at_end:n
+          {
+            \cs_if_exist:NF \hypersetup
+              { \cs_new_eq:NN \hypersetup \ctex_hypersetup:n }
+          }
+        \ctex_at_end_preamble:n { \RequirePackage { hyperref } }
+      } ,
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+%    \begin{macrocode}
+%</class|ctex>
+%<*class|ctex|ctexsize>
+%    \end{macrocode}
+%
+% \begin{macro}{10pt,11pt,12pt}
+% 使 \pkg{ctex} 和 \pkg{ctexsize} 可以接受文档类的全局选项，不修改默认字体大小。
+% 在文档类下还将参数传给标准文档类。
+%    \begin{macrocode}
+\tl_clear_new:N \l_@@_tmp_tl
+\clist_map_inline:nn
+  {
+    10pt , 11pt , 12pt ,
+     8pt ,  9pt , 14pt , 17pt , 20pt , 25pt , 30pt , 36pt , 48pt , 60pt
+  }
+  {
+    \tl_put_right:Nn \l_@@_tmp_tl
+      {
+        #1 .code:n =
+%<*!class>
+          { \int_gset:Nn \g_@@_font_size_int { 2 } } ,
+%</!class>
+%<*class>
+          {
+            \int_gset:Nn \g_@@_font_size_int { 2 }
+            \clist_gput_right:Nn \g_@@_std_options_clist {#1}
+          } ,
+%</class>
+        #1 .value_forbidden:n = true ,
+      }
+  }
+\use:x { \keys_define:nn { ctex / option } { \exp_not:o { \l_@@_tmp_tl } } }
+\tl_clear:N \l_@@_tmp_tl
+%    \end{macrocode}
+% \end{macro}
+%
+% 将未知选项传给标准文档类。
+%    \begin{macrocode}
+%<*class>
+\keys_define:nn { ctex / option }
+  {
+    unknown .code:n =
+      { \clist_gput_right:No \g_@@_std_options_clist { \CurrentOption } }
+  }
+%</class>
+%    \end{macrocode}
+%
+% 载入选项配置文件。
+%    \begin{macrocode}
+%<!ctexsize>\ctex_file_input:n { ctexopts.cfg }
+%</class|ctex|ctexsize>
+%    \end{macrocode}
+%
+% 处理宏包选项。
+%    \begin{macrocode}
+%<*class|style>
+\ProcessKeysOptions { ctex / option }
+%</class|style>
+%    \end{macrocode}
+%
+% \pdfLaTeX{} 下，如果没有显式指定编码为 |UTF8|，则给出警告信息。
+%    \begin{macrocode}
+%<*class|ctex>
+\msg_new:nnn { ctex } { pdftex-utf8 }
+  { UTF8~will~be~used~as~the~default~encoding. }
+\sys_if_engine_pdftex:T
+  {
+    \clist_if_in:NnF \CurrentOption { UTF8 }
+      {
+        \clist_if_in:NnF \CurrentOption { GBK }
+          { \msg_warning:nn { ctex } { pdftex-utf8 } }
+      }
+  }
+%</class|ctex>
+%    \end{macrocode}
+%
+%    \begin{macrocode}
+%<*class>
+%    \end{macrocode}
+%
+% 五号字使用标准文档类的 |10pt| 字体大小设置，小四号字则使用 |12pt|。
+%    \begin{macrocode}
+\if_case:w \g_@@_font_size_int
+  \clist_gput_right:Nn \g_@@_std_options_clist { 10pt }
+\or:
+  \clist_gput_right:Nn \g_@@_std_options_clist { 12pt }
+\fi:
+%    \end{macrocode}
+%
+% 使用 \tn{PassOptionsToClass} 是为了预防可能存在的选项冲突。
+%    \begin{macrocode}
+%<*article>
+\tl_const:Nn \c_@@_class_tl { article }
+\PassOptionsToClass { \g_@@_std_options_clist } { article }
+\LoadClass { article }
+%</article>
+%<*book>
+\tl_const:Nn \c_@@_class_tl { book }
+\PassOptionsToClass { \g_@@_std_options_clist } { book }
+\LoadClass { book }
+%</book>
+%<*report>
+\tl_const:Nn \c_@@_class_tl { report }
+\PassOptionsToClass { \g_@@_std_options_clist } { report }
+\LoadClass { report }
+%</report>
+%<*beamer>
+\tl_const:Nn \c_@@_class_tl { beamer }
+\PassOptionsToClass { \g_@@_std_options_clist } { beamer }
+\LoadClass { beamer }
+%</beamer>
+%    \end{macrocode}
+%
+%    \begin{macrocode}
+%</class>
+%    \end{macrocode}
