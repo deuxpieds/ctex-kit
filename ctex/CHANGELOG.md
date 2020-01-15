@@ -1,8 +1,14 @@
 # Changelog
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
+本文件格式依据 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)。
 
 ## [Unreleased]
+
+### Added
+
+- 增加字体映射文件 `zhmacfonts.tex`
+- 增加 `l3build` 有关测试文件
+- 增加 `CHANGELOG.md`
 
 ### Changed
 
@@ -14,6 +20,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - 简化操作系统与默认中文字库的判断，不再依赖特定引擎
 - `\ctex_if_platform_macos:TF`: 改用 `/System/Library/Fonts/Menlo.ttc` 为特征文件 - [#455](https://github.com/CTeX-org/ctex-kit/issues/455)
 - `windows` 使用环境变量代替绝对路径查找字体，即改用 `$WINDIR/Fonts/msyh.ttc` 为特征文件
+- 同步 LaTeX3 2020-01-12
+- 拆分 `ctex.dtx` 文件，分离用户文档与代码实现
+- 不再使用 `\changes` 标记变动，更新记录单独列于 `CHANGELOG.md` 文件中
 
 ### Fixed
 
@@ -26,8 +35,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Removed
 
 - 移除字库配置文件 `ctex-fontset-windowsnew.def` 和 `ctex-fontset-windowsold.def`
+- 移除 `dtx` 文件中的 checksum 信息
 
-## [ctex-v2.4.16] - 2019-05-29
+## [v2.4.16] - 2019-05-29
 
 ### Fixed
 
@@ -35,7 +45,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - 更好地兼容 `nameref` 宏包
 - 修正 `part/indent` 和 `chapter/indent` 的实现方法，在其标题内部禁用 `autoindent`
 
-## [ctex-v2.4.15] - 2019-04-05
+## [v2.4.15] - 2019-04-05
 
 ### Changed
 
@@ -45,13 +55,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - 定义 `part/hang` 和 `chapter/hang`
 - 局部指定 `autoindent` 为 `false`，并交换 `\CTEX@XXX@indent` 与 `\CTEX@XXX@format` 的顺序
 - 将 `JY2` 和 `JT2` 编码的字体定义提取到单独的文件中
-- 统一“方正细黑一\_GBK”的名称为 `FZXiHeiI-Z08`
+- 统一 `方正细黑一_GBK` 的名称为 `FZXiHeiI-Z08`
 
 ### Fixed
 
 - 修正 `part/indent` 和 `chapter/indent` 的实现方法
 
-## [ctex-v2.4.14] - 2018-05-01
+## [v2.4.14] - 2018-05-01
 
 ### Changed
 
@@ -59,13 +69,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - 配置 `macnew` 的默认字体设置
 - 为 `macnew` 配置字体命令
 
-## [ctex-v2.4.13] - 2018-03-23
+## [v2.4.13] - 2018-03-23
 
 ### Fixed
 
 - 修正导言区 `\selectfont` 钩子位置
 
-## [ctex-v2.4.12] - 2018-01-27
+## [v2.4.12] - 2018-01-27
 
 ### Changed
 
@@ -75,9 +85,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
-- 修正 `\ctexset` 在 `ctexheading` 包中无定义的错误（曾祥东）
+- 修正 `\ctexset` 在 `ctexheading` 包中无定义的错误
 
-## [ctex-v2.4.11] - 2017-11-21
+## [v2.4.11] - 2017-11-21
 
 ### Changed
 
@@ -86,30 +96,30 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - 因上游 `l3keys` 变化，重新定义 `format +` 等带空格加号的选项
 - `\ps@headings`: 补充页眉空格
 
-## [ctex-v2.4.10] - 2017-07-23
+## [v2.4.10] - 2017-07-23
 
 ### Changed
 
-- 使用 `lazy` 函数对 Boolean 表达式 进行最小化运算（LaTeX3 2017/07/19）
+- 使用 `lazy` 函数对 Boolean 表达式进行最小化运算（LaTeX3 2017/07/19）
 - 定义 `\cht`，`\cdp` 和 `\cwd`
 
 ### Deprecated
 
 - 常数 `\c_minus_one` 已过时
 
-## [ctex-v2.4.9] - 2017-02-27
+## [v2.4.9] - 2017-02-27
 
 ### Changed
 
 - 调整 `unicode-math` 补丁的代码顺序
 
-## [ctex-v2.4.8] - 2017-02-23
+## [v2.4.8] - 2017-02-23
 
 ### Changed
 
 - `\CTEX@fontfamily`: 解决与 `fontspec` 2017/01/24 v2.5d 的字体族匹配兼容问题
 
-## [ctex-v2.4.7] - 2016-12-27
+## [v2.4.7] - 2016-12-27
 
 ### Changed
 
@@ -119,7 +129,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - `\ps@headings`: 修复 `ctexrep` 类的 `\chaptermark` 汉化错误
 
-## [ctex-v2.4.6] - 2016-11-20
+## [v2.4.6] - 2016-11-20
 
 ### Changed
 
@@ -127,7 +137,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - `\CTEXifname` 初始为假
 - 重新初始化 `\ifthechapter` 等
 
-## [ctex-v2.4.5] - 2016-10-25
+## [v2.4.5] - 2016-10-25
 
 ### Added
 
@@ -139,7 +149,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - `\ps@headings`: 修复补丁失败
 
-## [ctex-v2.4.4] - 2016-09-19
+## [v2.4.4] - 2016-09-19
 
 ### Added
 
@@ -154,7 +164,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - 改进 `hyperref` 宏包的标题锚点设置
 - 使用 `titlesec` 时，章节目录也使用 CTeX 的编号
 
-## [ctex-v2.4.3] - 2016-08-26
+## [v2.4.3] - 2016-08-26
 
 ### Added
 
@@ -170,14 +180,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - 删除选项 `part/fixbeforeskip` 和 `chapter/fixbeforeskip`
 
-## [ctex-v2.4.2] - 2016-05-15
+## [v2.4.2] - 2016-05-15
 
 ### Changed
 
 - 恢复 `luatexja` 对 `\emshape` 和 `\eminnershape` 的重定义
 - `\em`: 兼容 upLaTeX 2016/05/07 u00 的定义
 
-## [ctex-v2.4.1] - 2016-05-14
+## [v2.4.1] - 2016-05-14
 
 ### Added
 
@@ -192,9 +202,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - `\chinese`: 支持 `\pagenumbering`
 - `beamer` 不调整默认字体大小
 - `beamer` 不调整默认行距
-- 使用 `bootfont.bin` 判断 Windows XP 以避免 权限问题
+- 使用 `bootfont.bin` 判断 Windows XP 以避免权限问题
 
-## [ctex-v2.4] - 2016-04-25
+## [v2.4] - 2016-04-25
 
 ### Changed
 
@@ -209,7 +219,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - `\ctex_parse_name:NN`: 修复宏名解析错误
 
-## [ctex-v2.3] - 2016-01-05
+## [v2.3] - 2016-01-05
 
 ### Changed
 
@@ -227,7 +237,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - 修复 `nameformat` 作用域问题
 
-## [ctex-v2.2] - 2015-06-30
+## [v2.2] - 2015-06-30
 
 ### Added
 
@@ -240,7 +250,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - 不再依赖 `etoolbox` 宏包
 - 给 `enumitem` 宏包注册 `\chinese` 和 `\zhnum`
-- `beforeskip` 和 `afterskip` 选项的符号 不再有特殊意义
+- `beforeskip` 和 `afterskip` 选项的符号不再有特殊意义
 - `beforeskip`、`afterskip` 和 `indent` 选项支持表达式
 - 非 `ctexart` 类的 `part/beforeskip` 和 `part/afterskip` 选项有意义
 - 将中文版式下的 `part` 和 `chapter` 标题的 `nameformat` 和 `titleformat` 选项的初值合并到 `format` 中
@@ -250,7 +260,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - 删去 `etoolbox` 与 `breqn` 的兼容补丁
 
-## [ctex-v2.1] - 2015-06-19
+## [v2.1] - 2015-06-19
 
 ### Added
 
@@ -264,26 +274,26 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - 给 pdfLaTeX 下的非 UTF8 编码 CJK 字体族加上 CMap
 - 不再设置 `hyperref` 宏包的 `colorlinks` 选项
 - `nameformat` 可以接受章节名字为参数
-- `format+`, `nameformat+` 等带加号的选项， 加号与前面的文字之间可以有可选的空格
+- `format+`, `nameformat+` 等带加号的选项，加号与前面的文字之间可以有可选的空格
 - `\ctex_if_platform_macos:TF`: 改用 `/Library/Fonts/Songti.ttc` 为特征文件
 
 ### Fixed
 
 - 修复 `ctexbook` 和 `ctexrep` 类的中文 `part/number` 选项初值为空的错误
 
-## [ctex-v2.0.2] - 2015-05-16
+## [v2.0.2] - 2015-05-16
 
 ### Fixed
 
-- 修复加载 `ctex` 宏包后章节标题后第一段 无段首缩进的问题
+- 修复加载 `ctex` 宏包后章节标题后第一段无段首缩进的问题
 
-## [ctex-v2.0.1] - 2015-05-15
+## [v2.0.1] - 2015-05-15
 
 ### Fixed
 
 - 修复 `10pt`、`11pt` 等选项无效的问题
 
-## [ctex-v2.0] - 2015-05-06
+## [v2.0] - 2015-05-06
 
 ### Added
 
@@ -306,7 +316,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - `\CJK@surr`: 解决与 `\nouppercase` 的冲突
 - 通过 `LuaTeX-ja` 宏包支持 LuaLaTeX
 - 自动检测操作系统，载入对应的字体配置
-- 默认关闭 `CJKfntef` 或 `xeCJKfntef` 的彩 色设置
+- 默认关闭 `CJKfntef` 或 `xeCJKfntef` 的彩色设置
 - 将标题汉化功能加入 `ctex.sty`
 - 将中文字号功能提取到可以独立使用的 `ctexsize`
 - 中文字号不再采用近似值
@@ -315,46 +325,48 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Deprecated
 
-- `\CTEXsetup`, `\CTEXoptions` 是过时命令
-- `c5size`, `cs4size` 是过时选项
-- `indent`, `noindent` 是过时选项
-- `nofonts`, `adobefonts`, `winfonts` 是过时选项
-- `nozhmap` 是过时选项
-- `nopunct` 是过时选项
-- `nospace` 是过时选项
-- `hyperref` 成为过时选项，原选项功能总是打开
-- `fancyhdr` 成为过时选项，原选项功能总是打开
-- `fntef` 成为过时选项，原选项功能总是打开
-- `\CTEXunderdot`, `\CTEXunderline`, `\CTEXunderdblline`, `\CTEXunderwave`, `\CTEXsout`, `\CTEXxout` 是过 时命令；`CTEXfilltwosides` 是过时环境
-- `\CTEXsetup`, `\CTEXoptions` 是过时命令
-- `\CTEXindent`, `\CTEXnoindent` 是过时命令
-- `captiondelimiter` 是过时选项
+- 过时命令和环境
+  - `\CTEXsetup`、`\CTEXoptions`
+  - `\CTEXunderdot`、`\CTEXunderline`、`\CTEXunderdblline`、`\CTEXunderwave`、`\CTEXsout`、`\CTEXxout`、`CTEXfilltwosides` 环境
+  - `\CTEXsetup`、`\CTEXoptions`
+  - `\CTEXindent`、`\CTEXnoindent`
+- 过时选项
+  - `c5size`、`cs4size`
+  - `indent`、`noindent`
+  - `nofonts`、`adobefonts`、`winfonts`
+  - `nozhmap`
+  - `nopunct`
+  - `nospace`
+  - `hyperref`（原选项功能总是打开）
+  - `fancyhdr`（原选项功能总是打开）
+  - `fntef`（原选项功能总是打开）
+  - `captiondelimiter` 是过时选项
 
 ### Removed
 
 - 删除 `c19gbsn.fd` 和 `c19gkai.fd`
 
 [Unreleased]: https://github.com/CTeX-org/ctex-kit/compare/ctex-v2.4.16...HEAD
-[ctex-v2.4.16]: https://github.com/CTeX-org/ctex-kit/compare/ctex-v2.4.15...ctex-v2.4.16
-[ctex-v2.4.15]: https://github.com/CTeX-org/ctex-kit/compare/ctex-v2.4.14...ctex-v2.4.15
-[ctex-v2.4.14]: https://github.com/CTeX-org/ctex-kit/compare/ctex-v2.4.13...ctex-v2.4.14
-[ctex-v2.4.13]: https://github.com/CTeX-org/ctex-kit/compare/ctex-v2.4.12...ctex-v2.4.13
-[ctex-v2.4.12]: https://github.com/CTeX-org/ctex-kit/compare/ctex-v2.4.11...ctex-v2.4.12
-[ctex-v2.4.11]: https://github.com/CTeX-org/ctex-kit/compare/ctex-v2.4.10...ctex-v2.4.11
-[ctex-v2.4.10]: https://github.com/CTeX-org/ctex-kit/compare/ctex-v2.4.9...ctex-v2.4.10
-[ctex-v2.4.9]: https://github.com/CTeX-org/ctex-kit/compare/ctex-v2.4.8...ctex-v2.4.9
-[ctex-v2.4.8]: https://github.com/CTeX-org/ctex-kit/compare/ctex-v2.4.7...ctex-v2.4.8
-[ctex-v2.4.7]: https://github.com/CTeX-org/ctex-kit/compare/ctex-v2.4.6...ctex-v2.4.7
-[ctex-v2.4.6]: https://github.com/CTeX-org/ctex-kit/compare/ctex-v2.4.5...ctex-v2.4.6
-[ctex-v2.4.5]: https://github.com/CTeX-org/ctex-kit/compare/ctex-v2.4.4...ctex-v2.4.5
-[ctex-v2.4.4]: https://github.com/CTeX-org/ctex-kit/compare/ctex-v2.4.3...ctex-v2.4.4
-[ctex-v2.4.3]: https://github.com/CTeX-org/ctex-kit/compare/ctex-v2.4.2...ctex-v2.4.3
-[ctex-v2.4.2]: https://github.com/CTeX-org/ctex-kit/compare/ctex-v2.4.1...ctex-v2.4.2
-[ctex-v2.4.1]: https://github.com/CTeX-org/ctex-kit/compare/ctex-v2.4...ctex-v2.4.1
-[ctex-v2.4]: https://github.com/CTeX-org/ctex-kit/compare/ctex-v2.3...ctex-v2.4
-[ctex-v2.3]: https://github.com/CTeX-org/ctex-kit/compare/ctex-v2.2...ctex-v2.3
-[ctex-v2.2]: https://github.com/CTeX-org/ctex-kit/compare/ctex-v2.1...ctex-v2.2
-[ctex-v2.1]: https://github.com/CTeX-org/ctex-kit/compare/ctex-v2.0.2...ctex-v2.1
-[ctex-v2.0.2]: https://github.com/CTeX-org/ctex-kit/compare/ctex-v2.0.1...ctex-v2.0.2
-[ctex-v2.0.1]: https://github.com/CTeX-org/ctex-kit/compare/ctex-v2.0...ctex-v2.0.1
-[ctex-v2.0]: https://github.com/CTeX-org/ctex-kit/releases/tag/ctex-v2.0
+[v2.4.16]: https://github.com/CTeX-org/ctex-kit/compare/ctex-v2.4.15...ctex-v2.4.16
+[v2.4.15]: https://github.com/CTeX-org/ctex-kit/compare/ctex-v2.4.14...ctex-v2.4.15
+[v2.4.14]: https://github.com/CTeX-org/ctex-kit/compare/ctex-v2.4.13...ctex-v2.4.14
+[v2.4.13]: https://github.com/CTeX-org/ctex-kit/compare/ctex-v2.4.12...ctex-v2.4.13
+[v2.4.12]: https://github.com/CTeX-org/ctex-kit/compare/ctex-v2.4.11...ctex-v2.4.12
+[v2.4.11]: https://github.com/CTeX-org/ctex-kit/compare/ctex-v2.4.10...ctex-v2.4.11
+[v2.4.10]: https://github.com/CTeX-org/ctex-kit/compare/ctex-v2.4.9...ctex-v2.4.10
+[v2.4.9]: https://github.com/CTeX-org/ctex-kit/compare/ctex-v2.4.8...ctex-v2.4.9
+[v2.4.8]: https://github.com/CTeX-org/ctex-kit/compare/ctex-v2.4.7...ctex-v2.4.8
+[v2.4.7]: https://github.com/CTeX-org/ctex-kit/compare/ctex-v2.4.6...ctex-v2.4.7
+[v2.4.6]: https://github.com/CTeX-org/ctex-kit/compare/ctex-v2.4.5...ctex-v2.4.6
+[v2.4.5]: https://github.com/CTeX-org/ctex-kit/compare/ctex-v2.4.4...ctex-v2.4.5
+[v2.4.4]: https://github.com/CTeX-org/ctex-kit/compare/ctex-v2.4.3...ctex-v2.4.4
+[v2.4.3]: https://github.com/CTeX-org/ctex-kit/compare/ctex-v2.4.2...ctex-v2.4.3
+[v2.4.2]: https://github.com/CTeX-org/ctex-kit/compare/ctex-v2.4.1...ctex-v2.4.2
+[v2.4.1]: https://github.com/CTeX-org/ctex-kit/compare/ctex-v2.4...ctex-v2.4.1
+[v2.4]: https://github.com/CTeX-org/ctex-kit/compare/ctex-v2.3...ctex-v2.4
+[v2.3]: https://github.com/CTeX-org/ctex-kit/compare/ctex-v2.2...ctex-v2.3
+[v2.2]: https://github.com/CTeX-org/ctex-kit/compare/ctex-v2.1...ctex-v2.2
+[v2.1]: https://github.com/CTeX-org/ctex-kit/compare/ctex-v2.0.2...ctex-v2.1
+[v2.0.2]: https://github.com/CTeX-org/ctex-kit/compare/ctex-v2.0.1...ctex-v2.0.2
+[v2.0.1]: https://github.com/CTeX-org/ctex-kit/compare/ctex-v2.0...ctex-v2.0.1
+[v2.0]: https://github.com/CTeX-org/ctex-kit/releases/tag/ctex-v2.0
