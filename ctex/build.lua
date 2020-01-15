@@ -41,8 +41,8 @@ function update_tag(file, content, tagname, isodate)
   if string.match(file, "%.dtx$") then
     content = string.gsub(content, "%d%d%d%d/%d%d/%d%d v[0-9.]+",
       date .. " " .. tagname)
-    content = string.gsub(content, "%d%d%d%d/%d%d/%d%d}{[0-9.]+",
-      date .. "}{" .. string.gsub(tagname, "^v", ""))
+    content = string.gsub(content, "%d%d%d%d%-%d%d%-%d%d}{[0-9.]+",
+      isodate .. "}{" .. string.gsub(tagname, "^v", ""))
   elseif string.match(file, "CHANGELOG.md") then
     local previous = string.match(content, "/compare/(.*)%.%.%.HEAD")
     content = string.gsub(content,
