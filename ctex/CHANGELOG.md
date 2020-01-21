@@ -27,6 +27,7 @@
 ### Fixed
 
 - 兼容 `titletoc`，防止目录中章节名和标题现重合 - [#472](https://github.com/CTeX-org/ctex-kit/issues/472)
+- 修复 `punct=plain` 在 XeLaTeX 编译时报错 - [#474](https://github.com/CTeX-org/ctex-kit/issues/474)
 
 ### Deprecated
 
